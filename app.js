@@ -292,18 +292,21 @@
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 60);
-    camera.position.set(0, 0.8, 7.4);
+    const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 60);
+    camera.position.set(0, 0.95, 7.8);
     camera.lookAt(0, 0.1, 0);
     setupLights(scene);
 
     const stage = new THREE.Group();
     scene.add(stage);
 
-    const gpu = makeGPU({ scale: 1.45 });
+    const gpu = makeGPU({ scale: 1.52 });
     stage.add(gpu);
     addHoloRings(stage);
     addParticleField(scene, 520, 18);
+    const rim = new THREE.PointLight(GREEN_BRIGHT, 1.4, 18);
+    rim.position.set(-4, 1.6, -3.5);
+    scene.add(rim);
 
     let mx = 0, my = 0, tMx = 0, tMy = 0;
     window.addEventListener('pointermove', (e) => {
@@ -327,8 +330,8 @@
       const t = clock.getElapsedTime();
       mx = lerp(mx, tMx, 0.06);
       my = lerp(my, tMy, 0.06);
-      gpu.rotation.y = t * 0.22 + mx * 0.35;
-      gpu.rotation.x = Math.sin(t * 0.5) * 0.07 + my * -0.18;
+      gpu.rotation.y = t * 0.16 + mx * 0.2;
+      gpu.rotation.x = Math.sin(t * 0.45) * 0.04 + my * -0.1;
       gpu.position.y = Math.sin(t * 0.8) * 0.06;
       fans.forEach((f) => (f.rotation.y -= 0.26));
       renderer.render(scene, camera);
@@ -783,7 +786,8 @@
       $('#cert-ts').textContent = ts.toLocaleString();
       $('#cert-uv').textContent = `-${uv} mV`;
 
-      $('#ro-uid').textContent = serial;
+      const roUid = $('#ro-uid');
+      if (roUid) roUid.textContent = serial;
     }
 
     $('.cfg-cta').addEventListener('click', () => {
@@ -818,6 +822,199 @@
       if (gpu.userData.cards) {
         gpu.userData.cards.forEach((c) => c.userData.fans.forEach((f) => (f.rotation.y -= 0.35)));
       }
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    };
+    animate();
+  }
+
+  /* --------------------------------------------------------
+     BUILDER page — enterprise full page configurator
+     -------------------------------------------------------- */
+  function initBuilderPage() {
+    const canvas = $('#builder-canvas');
+    if (!canvas) return;
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(33, 1, 0.1, 60);
+    camera.position.set(0, 1.15, 8.8);
+    camera.lookAt(0, 0.25, 0);
+    const lights = setupLights(scene, 0x9ad6ff);
+    addParticleField(scene, 320, 14, 0x8fccff);
+
+    const holder = new THREE.Group();
+    scene.add(holder);
+    const holo = addHoloRings(holder, 0x9ad6ff);
+    let gpu = makeGPU({ scale: 1.2 });
+    holder.add(gpu);
+
+    const platformMap = {
+      '4090': { dual: false, rack: false, scale: 1.2, vram: 24, price: 2600 },
+      'a6000': { dual: false, rack: false, scale: 1.18, vram: 48, price: 3200 },
+      'dual3090': { dual: true, rack: false, scale: 0.95, vram: 48, price: 2900 },
+      'cluster': { dual: false, rack: true, scale: 1.05, vram: 96, price: 8400 }
+    };
+    const workloadMap = {
+      ai: { accent: 0x9ad6ff, perf: 118 },
+      studio: { accent: 0xffb56e, perf: 106 },
+      gaming: { accent: 0xff7a77, perf: 122 },
+      lab: { accent: 0xbf98ff, perf: 174 }
+    };
+    const processSteps = ['intake', 'tear', 'thermal', 'tune', 'cert'];
+    let currentPlatform = '4090';
+    let currentWorkload = 'ai';
+    let currentStep = 'intake';
+
+    const setAccent = (hex) => {
+      lights.p1.color.setHex(hex);
+      lights.p3.color.setHex(hex);
+      if (holo) {
+        holo.traverse((o) => {
+          if (o.material && o.material.color) o.material.color.setHex(hex);
+        });
+      }
+      holder.traverse((o) => {
+        if (!o.material) return;
+        if (o.material.emissive && o.material.emissiveIntensity > 0.1) o.material.emissive.setHex(hex);
+        if (o.material.isMeshBasicMaterial && o.material.color) o.material.color.setHex(hex);
+      });
+    };
+
+    const rebuild = () => {
+      const cfg = platformMap[currentPlatform];
+      holder.remove(gpu);
+      gpu.traverse((o) => {
+        if (o.geometry) o.geometry.dispose();
+        if (o.material) {
+          if (Array.isArray(o.material)) o.material.forEach((m) => m.dispose());
+          else o.material.dispose();
+        }
+      });
+      gpu = makeGPU({ scale: cfg.scale, dual: cfg.dual, rack: cfg.rack });
+      holder.add(gpu);
+      setAccent(workloadMap[currentWorkload].accent);
+      recompute();
+    };
+
+    const setActive = (selector, val) => {
+      $$(selector).forEach((b) => b.classList.toggle('active', b.dataset.val === val || b.dataset.step === val));
+    };
+
+    const recompute = () => {
+      const cfg = platformMap[currentPlatform];
+      const wl = workloadMap[currentWorkload];
+      const tdp = parseInt($('#builder-tdp')?.value || '82', 10);
+      const uv = parseInt($('#builder-uv')?.value || '105', 10);
+      const cooling = parseInt($('#builder-cooling')?.value || '68', 10);
+      const delta = Math.round(9 + uv * 0.05 + (100 - tdp) * 0.16 + cooling * 0.04);
+      const tokens = Math.round(wl.perf * (tdp / 100) * (1 - uv * 0.00035));
+      const price = Math.round(cfg.price + (tdp - 82) * 7 + uv * 0.7 + cooling * 4);
+      $('#builder-vram') && ($('#builder-vram').textContent = String(cfg.vram));
+      $('#builder-temp') && ($('#builder-temp').textContent = String(delta));
+      $('#builder-tok') && ($('#builder-tok').textContent = String(tokens));
+      $('#builder-price') && ($('#builder-price').textContent = price.toLocaleString());
+      $('#builder-tdp-val') && ($('#builder-tdp-val').textContent = `${tdp}%`);
+      $('#builder-uv-val') && ($('#builder-uv-val').textContent = `-${uv} mV`);
+      $('#builder-cooling-val') && ($('#builder-cooling-val').textContent = `${cooling}%`);
+      $('#builder-model') && ($('#builder-model').textContent = `GPU: ${currentPlatform.toUpperCase()}`);
+      $('#builder-profile') && ($('#builder-profile').textContent = `PROFILE: ${currentWorkload.toUpperCase()}`);
+    };
+
+    const applyStepUI = () => {
+      setActive('.builder-step', currentStep);
+      const label = {
+        intake: 'Step 01 · Intake scan & teardown map',
+        tear: 'Step 02 · Full disassembly & contamination removal',
+        thermal: 'Step 03 · Thermal stack rebuild and repaste',
+        tune: 'Step 04 · Voltage curve tuning under live load',
+        cert: 'Step 05 · 24h certification and signed report'
+      }[currentStep];
+      $('#builder-step-title') && ($('#builder-step-title').textContent = label);
+    };
+
+    $$('.builder-platform .opt').forEach((b) => b.addEventListener('click', () => {
+      currentPlatform = b.dataset.val;
+      setActive('.builder-platform .opt', currentPlatform);
+      rebuild();
+    }));
+    $$('.builder-workload .opt').forEach((b) => b.addEventListener('click', () => {
+      currentWorkload = b.dataset.val;
+      setActive('.builder-workload .opt', currentWorkload);
+      setAccent(workloadMap[currentWorkload].accent);
+      recompute();
+    }));
+    $$('.builder-step').forEach((b) => b.addEventListener('click', () => {
+      currentStep = b.dataset.step;
+      applyStepUI();
+    }));
+    ['builder-tdp', 'builder-uv', 'builder-cooling'].forEach((id) => {
+      const el = $('#' + id);
+      if (el) el.addEventListener('input', recompute);
+    });
+
+    $$('.part-chip').forEach((chip) => {
+      chip.addEventListener('mouseenter', () => holder.rotation.y += 0.18);
+      chip.addEventListener('click', () => {
+        const part = chip.dataset.part;
+        if (part === 'fans' || part === 'vrm') currentStep = 'thermal';
+        else if (part === 'core') currentStep = 'tune';
+        else currentStep = 'tear';
+        applyStepUI();
+      });
+    });
+
+    let autoIndex = 0;
+    setInterval(() => {
+      autoIndex = (autoIndex + 1) % processSteps.length;
+      if (document.visibilityState === 'visible') {
+        currentStep = processSteps[autoIndex];
+        applyStepUI();
+      }
+    }, 5600);
+
+    const resize = () => {
+      const r = canvas.getBoundingClientRect();
+      renderer.setSize(r.width, r.height, false);
+      camera.aspect = r.width / r.height;
+      camera.updateProjectionMatrix();
+    };
+    new ResizeObserver(resize).observe(canvas);
+    resize();
+
+    setActive('.builder-platform .opt', currentPlatform);
+    setActive('.builder-workload .opt', currentWorkload);
+    applyStepUI();
+    recompute();
+
+    const clock = new THREE.Clock();
+    const animate = () => {
+      const t = clock.getElapsedTime();
+      const ex = currentStep === 'tear' || currentStep === 'thermal' ? 1 : 0;
+      const tune = currentStep === 'tune' ? 1 : 0;
+      const cert = currentStep === 'cert' ? 1 : 0;
+      const cards = gpu.userData.cards || [];
+      cards.forEach((card) => {
+        const shroud = card.children[1];
+        const fins = card.children.slice(2, 20);
+        const fans = card.userData.fans || [];
+        if (shroud) shroud.position.y = lerp(shroud.position.y, 0.35 + ex * 1.1, 0.08);
+        fins.forEach((fin, i) => {
+          const base = -0.55 + i * 0.062;
+          const spread = ex ? (i - fins.length / 2) * 0.09 : 0;
+          fin.position.z = lerp(fin.position.z, base + spread, 0.08);
+          fin.position.y = lerp(fin.position.y, 0.35 + ex * 0.48, 0.08);
+        });
+        fans.forEach((f, i) => {
+          const tx = ex ? (i === 0 ? -2 : 2) : (i === 0 ? -1.1 : 1.1);
+          f.position.x = lerp(f.position.x, tx, 0.08);
+          f.position.y = lerp(f.position.y, 0.65 + ex * 0.6, 0.08);
+          f.rotation.y -= 0.24 + tune * 0.12 + cert * 0.08;
+        });
+      });
+      gpu.rotation.y = lerp(gpu.rotation.y, t * 0.11 + cert * 0.2, 0.08);
+      gpu.rotation.x = lerp(gpu.rotation.x, Math.sin(t * 0.45) * 0.04 + ex * 0.04, 0.08);
+      gpu.position.y = Math.sin(t * 0.8) * 0.06;
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
@@ -929,6 +1126,7 @@
     try { initAnatomy(); } catch (e) { console.warn('anatomy', e); }
     try { initLayers(); } catch (e) { console.warn('layers', e); }
     try { initConfigurator(); } catch (e) { console.warn('cfg', e); }
+    try { initBuilderPage(); } catch (e) { console.warn('builder', e); }
     initFanBars();
     initBenchStream();
     initTilt();

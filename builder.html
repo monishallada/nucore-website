@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Enterprise GPU Builder — Nucore</title>
+<meta name="description" content="Design a production-ready GPU unit with Nucore's full enterprise builder. Exploded 3D hardware view, process simulation, and live certification metrics."/>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=Archivo+Black&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+<div class="ambient">
+  <div class="ambient-grid"></div>
+  <div class="ambient-orb o1"></div>
+  <div class="ambient-orb o2"></div>
+  <div class="ambient-noise"></div>
+</div>
+
+<header class="nav" id="nav">
+  <a href="index.html" class="nav-brand">
+    <img src="assets/logo.svg" alt="" class="nav-logo"/>
+    <span class="nav-word">NUCORE<sup>®</sup></span>
+    <span class="nav-sub">TECHNOLOGIES</span>
+  </a>
+  <nav class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="engineering.html">Engineering</a>
+    <a href="products.html">Products</a>
+    <a href="builder.html" class="active-link">Builder</a>
+    <a href="index.html#platform">Platform</a>
+  </nav>
+  <a href="#builder" class="nav-cta">
+    <span>Build Yours</span>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M11 7L7 3M11 7L7 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </a>
+</header>
+
+<main class="builder-page">
+  <section class="page-hero">
+    <div class="page-hero-inner">
+      <div class="page-breadcrumbs"><a href="index.html">Home</a><span>/</span><span>Builder</span></div>
+      <div class="page-eyebrow"><span class="eyebrow-dot"></span><span>ENTERPRISE GPU BUILDER</span></div>
+      <h1 class="page-title">Build a GPU like an <em>automotive configurator.</em></h1>
+      <p class="page-lede">Inspect each component in 3D, run through each engineering stage, and generate a production-grade unit profile with thermal and performance projections.</p>
+      <div class="page-hero-meta">
+        <div><em>MODELS</em><span>4</span></div>
+        <div><em>PROCESS</em><span>5 stages</span></div>
+        <div><em>ANIMATED PARTS</em><span>core + fans + fins</span></div>
+        <div><em>OUTPUT</em><span>enterprise profile</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="builder" class="builder-shell">
+    <div class="builder-stage">
+      <canvas id="builder-canvas"></canvas>
+      <div class="builder-overlay">
+        <div class="builder-readout" id="builder-model">GPU: 4090</div>
+        <div class="builder-readout" id="builder-profile">PROFILE: AI</div>
+      </div>
+      <div class="builder-parts">
+        <button class="part-chip" data-part="shroud">Shroud</button>
+        <button class="part-chip" data-part="fans">Fans</button>
+        <button class="part-chip" data-part="core">GPU Die</button>
+        <button class="part-chip" data-part="vrm">VRM Stack</button>
+        <button class="part-chip" data-part="fins">Fin Stack</button>
+      </div>
+    </div>
+
+    <aside class="builder-panel">
+      <div class="cfg-section">
+        <div class="cfg-label"><span>01</span> PLATFORM</div>
+        <div class="cfg-options builder-platform">
+          <button class="opt active" data-val="4090">RTX 4090</button>
+          <button class="opt" data-val="a6000">NVIDIA A6000</button>
+          <button class="opt" data-val="dual3090">DUAL RTX 3090</button>
+          <button class="opt" data-val="cluster">4x GPU CLUSTER</button>
+        </div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-label"><span>02</span> WORKLOAD PROFILE</div>
+        <div class="cfg-options builder-workload">
+          <button class="opt active" data-val="ai">AI INFERENCE</button>
+          <button class="opt" data-val="studio">CREATIVE STUDIO</button>
+          <button class="opt" data-val="gaming">GAMING</button>
+          <button class="opt" data-val="lab">ML LAB</button>
+        </div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-label"><span>03</span> PROCESS STAGE</div>
+        <div class="builder-steps">
+          <button class="builder-step active" data-step="intake">Intake & scan</button>
+          <button class="builder-step" data-step="tear">Disassembly</button>
+          <button class="builder-step" data-step="thermal">Thermal rebuild</button>
+          <button class="builder-step" data-step="tune">Silicon tuning</button>
+          <button class="builder-step" data-step="cert">Certification</button>
+        </div>
+        <div class="builder-step-title" id="builder-step-title">Step 01 · Intake scan & teardown map</div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-label"><span>04</span> ENVELOPE</div>
+        <div class="cfg-sliders">
+          <div class="slider">
+            <div class="slider-head"><span>Power limit</span><em id="builder-tdp-val">82%</em></div>
+            <input id="builder-tdp" type="range" min="60" max="100" value="82"/>
+          </div>
+          <div class="slider">
+            <div class="slider-head"><span>Undervolt</span><em id="builder-uv-val">-105 mV</em></div>
+            <input id="builder-uv" type="range" min="0" max="200" value="105"/>
+          </div>
+          <div class="slider">
+            <div class="slider-head"><span>Cooling aggressiveness</span><em id="builder-cooling-val">68%</em></div>
+            <input id="builder-cooling" type="range" min="30" max="100" value="68"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="builder-summary">
+        <div class="builder-kpi"><em>VRAM</em><span><span id="builder-vram">24</span> GB</span></div>
+        <div class="builder-kpi"><em>THERMAL DELTA</em><span>-<span id="builder-temp">17</span>°C</span></div>
+        <div class="builder-kpi"><em>INFERENCE (8B)</em><span><span id="builder-tok">118</span> tok/s</span></div>
+        <div class="builder-kpi"><em>EST. UNIT PRICE</em><span class="price">$<span id="builder-price">2,600</span></span></div>
+      </div>
+    </aside>
+  </section>
+</main>
+
+<script src="https://unpkg.com/three@0.148.0/build/three.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
