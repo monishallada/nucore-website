@@ -93,73 +93,6 @@ em {
 }
 
 /* ============================================================
-   Preloader
-   ============================================================ */
-.preloader {
-  position: fixed;
-  inset: 0;
-  background: var(--bg-0);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.8s var(--ease), visibility 0.8s;
-}
-.preloader.hide {
-  opacity: 0;
-  visibility: hidden;
-}
-.preloader-inner {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 28px;
-}
-.preloader-logo {
-  width: 72px;
-  height: 72px;
-  filter: drop-shadow(0 0 24px rgba(168, 255, 77, 0.28));
-  animation: spinY 3.6s infinite linear;
-}
-@keyframes spinY {
-  0% {
-    transform: rotateY(0);
-  }
-  100% {
-    transform: rotateY(360deg);
-  }
-}
-.preloader-bar {
-  width: 220px;
-  height: 2px;
-  background: var(--line);
-  border-radius: 4px;
-  overflow: hidden;
-  position: relative;
-}
-.preloader-bar span {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, var(--green), var(--green-3));
-  animation: preFill 1.6s var(--ease-out) forwards;
-}
-@keyframes preFill {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-.preloader-status {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 3px;
-  color: var(--text-3);
-}
-
-/* ============================================================
    Cursor (disabled on touch)
    ============================================================ */
 .cursor,
@@ -294,10 +227,22 @@ em {
   height: 28px;
 }
 .nav-word {
-  font-family: var(--font-display);
-  font-weight: 600;
+  font-family: 'Archivo Black', var(--font-display);
+  font-weight: 900;
   font-size: 15px;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 1px;
+}
+.nav-word sup {
+  font-size: 7px;
+  font-family: var(--font-mono);
+  color: var(--green-3);
+  margin-top: 1px;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 .nav-sub {
   font-family: var(--font-mono);
@@ -2249,10 +2194,22 @@ input[type='range']::-moz-range-thumb {
   gap: 2px;
 }
 .foot-word {
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-family: 'Archivo Black', var(--font-display);
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 2px;
+}
+.foot-word sup {
+  font-size: 9px;
+  font-family: var(--font-mono);
+  color: var(--green-3);
+  margin-top: 3px;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 .foot-sub {
   font-family: var(--font-mono);
