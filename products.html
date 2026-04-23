@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Products — Nucore</title>
+<meta name="description" content="Five tiers of precision-engineered compute. Configure and certify your Nucore unit live in 3D."/>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=Archivo+Black&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- Ambient background -->
+<div class="ambient">
+  <div class="ambient-grid"></div>
+  <div class="ambient-orb o1"></div>
+  <div class="ambient-orb o2"></div>
+  <div class="ambient-noise"></div>
+</div>
+
+<!-- Nav -->
+<header class="nav" id="nav">
+  <a href="index.html" class="nav-brand">
+    <img src="assets/logo.svg" alt="" class="nav-logo"/>
+    <span class="nav-word">NUCORE<sup>®</sup></span>
+    <span class="nav-sub">TECHNOLOGIES</span>
+  </a>
+  <nav class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="engineering.html">Engineering</a>
+    <a href="products.html" class="active-link">Products</a>
+    <a href="products.html#configurator">Configure</a>
+    <a href="index.html#platform">Platform</a>
+  </nav>
+  <a href="products.html#configurator" class="nav-cta">
+    <span>Build Yours</span>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M11 7L7 3M11 7L7 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </a>
+</header>
+
+<main id="top">
+
+<!-- Page hero -->
+<section class="page-hero">
+  <div class="page-hero-inner">
+    <div class="page-breadcrumbs">
+      <a href="index.html">Home</a>
+      <span>/</span>
+      <span>Products</span>
+    </div>
+    <div class="page-eyebrow"><span class="eyebrow-dot"></span><span>FIVE TIERS · ONE STANDARD · HAND-CERTIFIED</span></div>
+    <h1 class="page-title">Compute, <em>configured to your workload.</em></h1>
+    <p class="page-lede">Every tier goes through the same four-layer process. Silicon changes, certification does not. Pick a tier — or design your own unit in the live configurator below.</p>
+    <div class="page-hero-meta">
+      <div><em>TIERS</em><span>05</span></div>
+      <div><em>FROM</em><span>$380</span></div>
+      <div><em>VRAM</em><span>8 – 96 GB</span></div>
+      <div><em>SHIPS WITH</em><span>signed cert</span></div>
+    </div>
+    <div class="page-cta-row">
+      <a href="#lineup" class="btn btn-primary">
+        <span>Browse Tiers</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M13 8l-4-4M13 8l-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </a>
+      <a href="#configurator" class="btn btn-ghost"><span>Open Configurator</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCT LINEUP -->
+<section class="lineup" id="lineup">
+  <div class="section-head">
+    <div class="section-index">01 / LINEUP</div>
+    <h2 class="section-title">Five tiers. One standard.</h2>
+    <p class="section-lede">Every tier goes through the same four-layer process. Silicon changes. Certification does not.</p>
+  </div>
+
+  <div class="lineup-grid">
+    <article class="prod tilt" data-tier="lite">
+      <div class="prod-top">
+        <div class="prod-tag">ENTRY · 1ST AI BUILD</div>
+        <div class="prod-price">$380–$450</div>
+      </div>
+      <h3 class="prod-name">Nucore <span>Lite</span></h3>
+      <div class="prod-mini">
+        <div class="pm-card"></div>
+      </div>
+      <p class="prod-body">Students, indie devs, first-time AI. Based on RTX 3060 / 3070 with a full local-AI stack ready on day one.</p>
+      <ul class="prod-specs">
+        <li><em>Platform</em><span>RTX 3060 / 3070</span></li>
+        <li><em>VRAM</em><span>8–12 GB</span></li>
+        <li><em>Stack</em><span>Ollama · Llama 3.1 8B</span></li>
+      </ul>
+    </article>
+
+    <article class="prod tilt featured" data-tier="pro">
+      <div class="prod-top">
+        <div class="prod-tag">FLAGSHIP · 24/7 AI</div>
+        <div class="prod-price">$850–$1,050</div>
+      </div>
+      <h3 class="prod-name">Nucore <span>Pro</span></h3>
+      <div class="prod-mini">
+        <div class="pm-card"></div>
+      </div>
+      <p class="prod-body">Maximum inference under sustained 24/7 load. For AI developers and researchers who demand reliability first.</p>
+      <ul class="prod-specs">
+        <li><em>Platform</em><span>RTX 3090 / 5070</span></li>
+        <li><em>VRAM</em><span>12–24 GB</span></li>
+        <li><em>Stack</em><span>CUDA 12 · Ollama · PyTorch</span></li>
+      </ul>
+    </article>
+
+    <article class="prod tilt" data-tier="studio">
+      <div class="prod-top">
+        <div class="prod-tag">CREATIVE · SILENT</div>
+        <div class="prod-price">$2,400–$3,000</div>
+      </div>
+      <h3 class="prod-name">Nucore <span>Studio</span></h3>
+      <div class="prod-mini">
+        <div class="pm-card"></div>
+      </div>
+      <p class="prod-body">Engineered for image &amp; video generation. Pre-loaded ComfyUI, A1111, ControlNet, DaVinci Resolve. Silent under long renders.</p>
+      <ul class="prod-specs">
+        <li><em>Platform</em><span>RTX 4090 / A6000</span></li>
+        <li><em>VRAM</em><span>24–48 GB</span></li>
+        <li><em>Stack</em><span>ComfyUI · SDXL · Resolve</span></li>
+      </ul>
+    </article>
+
+    <article class="prod tilt" data-tier="lab">
+      <div class="prod-top">
+        <div class="prod-tag">RESEARCH · NVLINK</div>
+        <div class="prod-price">$2,200–$2,800</div>
+      </div>
+      <h3 class="prod-name">Nucore <span>Lab</span></h3>
+      <div class="prod-mini">
+        <div class="pm-card pm-dual"></div>
+      </div>
+      <p class="prod-body">Dual RTX 3090 with NVLink bridge. 48 GB combined VRAM. Training-class compute at a fraction of enterprise pricing.</p>
+      <ul class="prod-specs">
+        <li><em>Platform</em><span>2× RTX 3090 NVLink</span></li>
+        <li><em>VRAM</em><span>48 GB combined</span></li>
+        <li><em>Stack</em><span>PyTorch · DDP · FSDP</span></li>
+      </ul>
+    </article>
+
+    <article class="prod tilt prod-wide" data-tier="cluster">
+      <div class="prod-top">
+        <div class="prod-tag">INFRASTRUCTURE · ON-PREM</div>
+        <div class="prod-price">$6,000–$9,000</div>
+      </div>
+      <h3 class="prod-name">Nucore <span>Cluster</span></h3>
+      <div class="prod-mini prod-mini-wide">
+        <div class="pm-rack"><span></span><span></span><span></span><span></span></div>
+      </div>
+      <p class="prod-body">4-GPU 2U rack-mount. 96 GB combined VRAM. Nucore OS with an OpenAI-compatible endpoint pre-configured. 10GbE networking. Remote management. Private AI infrastructure, delivered ready to deploy.</p>
+      <ul class="prod-specs">
+        <li><em>Platform</em><span>4× GPU · 2U rack</span></li>
+        <li><em>VRAM</em><span>96 GB total</span></li>
+        <li><em>Stack</em><span>Nucore OS · OpenAI API</span></li>
+        <li><em>Network</em><span>10GbE · Remote mgmt</span></li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<!-- LIVE CONFIGURATOR -->
+<section class="configurator" id="configurator">
+  <div class="section-head">
+    <div class="section-index">02 / CONFIGURE</div>
+    <h2 class="section-title">Build your unit. <em>Live.</em></h2>
+    <p class="section-lede">Pick a platform, choose a workload profile, tune the envelope. The 3D model updates in real time. The benchmark certificate previews itself as you go.</p>
+  </div>
+
+  <div class="cfg">
+    <div class="cfg-left">
+      <canvas id="cfg-canvas"></canvas>
+      <div class="cfg-overlay">
+        <div class="cfg-tag" id="cfg-tag">RTX 4090 · STUDIO</div>
+        <div class="cfg-serial" id="cfg-serial">NC-4090-A0917 · 2026</div>
+      </div>
+      <div class="cfg-rings"></div>
+    </div>
+
+    <div class="cfg-right">
+      <div class="cfg-section">
+        <div class="cfg-label"><span>01</span> PLATFORM</div>
+        <div class="cfg-options" data-group="platform">
+          <button class="opt" data-val="3060" data-vram="12" data-price="420">RTX 3060</button>
+          <button class="opt" data-val="3070" data-vram="12" data-price="480">RTX 3070</button>
+          <button class="opt" data-val="3090" data-vram="24" data-price="920">RTX 3090</button>
+          <button class="opt" data-val="5070" data-vram="16" data-price="1050">RTX 5070</button>
+          <button class="opt active" data-val="4090" data-vram="24" data-price="2600">RTX 4090</button>
+          <button class="opt" data-val="a6000" data-vram="48" data-price="3000">NVIDIA A6000</button>
+          <button class="opt" data-val="dual3090" data-vram="48" data-price="2600">DUAL 3090 NVLINK</button>
+          <button class="opt" data-val="cluster" data-vram="96" data-price="8200">4× GPU CLUSTER</button>
+        </div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-label"><span>02</span> WORKLOAD PROFILE</div>
+        <div class="cfg-options cfg-workload" data-group="workload">
+          <button class="opt opt-lg active" data-val="ai" data-tdp="80">
+            <em>AI / INFERENCE</em>
+            <span>24/7 sustained · low-voltage curve</span>
+          </button>
+          <button class="opt opt-lg" data-val="creative" data-tdp="88">
+            <em>CREATIVE STUDIO</em>
+            <span>Silent sustained · long render queues</span>
+          </button>
+          <button class="opt opt-lg" data-val="gaming" data-tdp="95">
+            <em>GAMING</em>
+            <span>Burst performance · low-latency driver</span>
+          </button>
+          <button class="opt opt-lg" data-val="lab" data-tdp="85">
+            <em>ML LAB</em>
+            <span>Training · NVLink · multi-GPU aware</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-label"><span>03</span> ENVELOPE</div>
+        <div class="cfg-sliders">
+          <div class="slider">
+            <div class="slider-head">
+              <span>Power limit</span>
+              <em id="val-tdp">80%</em>
+            </div>
+            <input type="range" id="sl-tdp" min="60" max="100" value="80"/>
+          </div>
+          <div class="slider">
+            <div class="slider-head">
+              <span>Undervolt</span>
+              <em id="val-uv">-112 mV</em>
+            </div>
+            <input type="range" id="sl-uv" min="0" max="200" value="112"/>
+          </div>
+          <div class="slider">
+            <div class="slider-head">
+              <span>Fan floor</span>
+              <em id="val-fan">22%</em>
+            </div>
+            <input type="range" id="sl-fan" min="10" max="60" value="22"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="cfg-summary">
+        <div class="sum-row">
+          <div class="sum-k">VRAM</div>
+          <div class="sum-v"><span id="sum-vram">24</span> GB</div>
+        </div>
+        <div class="sum-row">
+          <div class="sum-k">ESTIMATED Δ TEMP</div>
+          <div class="sum-v">-<span id="sum-dt">17</span>°C</div>
+        </div>
+        <div class="sum-row">
+          <div class="sum-k">INFERENCE</div>
+          <div class="sum-v"><span id="sum-tok">118</span> tok/s · 8B</div>
+        </div>
+        <div class="sum-row sum-total">
+          <div class="sum-k">UNIT PRICE</div>
+          <div class="sum-v sum-price">$<span id="sum-price">2,600</span></div>
+        </div>
+        <button class="btn btn-primary cfg-cta">
+          <span>Generate Certificate</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M13 8l-4-4M13 8l-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Certificate preview -->
+  <div class="certificate" id="certificate">
+    <div class="cert-frame">
+      <div class="cert-head">
+        <img src="assets/logo.svg" alt="" class="cert-logo"/>
+        <div class="cert-head-text">
+          <div class="cert-k">NUCORE CERTIFICATION</div>
+          <div class="cert-t">UNIT BENCHMARK &amp; THERMAL REPORT</div>
+        </div>
+        <div class="cert-cert" id="cert-uid">NC-4090-A0917</div>
+      </div>
+      <div class="cert-body">
+        <div class="cert-col">
+          <div class="cert-row"><em>Platform</em><span id="cert-plat">RTX 4090</span></div>
+          <div class="cert-row"><em>Profile</em><span id="cert-prof">AI / Inference</span></div>
+          <div class="cert-row"><em>VRAM</em><span id="cert-vram">24 GB</span></div>
+          <div class="cert-row"><em>Power Limit</em><span id="cert-tdp">80% TDP</span></div>
+        </div>
+        <div class="cert-col">
+          <div class="cert-row"><em>Idle Temp</em><span id="cert-idle">34°C</span></div>
+          <div class="cert-row"><em>Load Temp · 30m</em><span id="cert-load">64°C</span></div>
+          <div class="cert-row"><em>Load Temp · 24h</em><span id="cert-soak">66°C</span></div>
+          <div class="cert-row"><em>VRAM Integrity</em><span class="pass">PASS</span></div>
+        </div>
+        <div class="cert-col">
+          <div class="cert-row"><em>Tokens/s · 8B</em><span id="cert-tok">118</span></div>
+          <div class="cert-row"><em>TimeSpy</em><span id="cert-ts">28,402</span></div>
+          <div class="cert-row"><em>Undervolt</em><span id="cert-uv">-112 mV</span></div>
+          <div class="cert-row"><em>Signed</em><span>M. ALLADA</span></div>
+        </div>
+      </div>
+      <div class="cert-foot">
+        <span>CERTIFIED 2026 · NUCORE TECHNOLOGIES</span>
+        <span class="cert-sig">— signed and shipped with every unit</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="cta">
+  <div class="cta-inner">
+    <div class="cta-tag">RESERVE A UNIT</div>
+    <h2 class="cta-title">Your workload deserves a unit built for it.</h2>
+    <p class="cta-lede">Every Nucore ships signed, certified, and tuned. Tell us the workload — we'll send a configuration and a delivery window.</p>
+    <form class="cta-form" onsubmit="event.preventDefault(); window.__nucore && window.__nucore.submitCta(this);">
+      <input type="email" required placeholder="your@email" aria-label="Email"/>
+      <select aria-label="Interest">
+        <option>Nucore Pro — AI</option>
+        <option>Nucore Studio — Creative</option>
+        <option>Nucore Lab — Training</option>
+        <option>Nucore Cluster — On-prem</option>
+        <option>Not sure yet</option>
+      </select>
+      <button type="submit" class="btn btn-primary">
+        <span>Request Configuration</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M13 8l-4-4M13 8l-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </form>
+    <div class="cta-toast" id="cta-toast">Request received. A Nucore engineer will reach out within 48 hours.</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="foot-brand">
+      <img src="assets/logo.svg" alt="" class="foot-logo"/>
+      <div class="foot-brand-text">
+        <div class="foot-word">NUCORE<sup>®</sup></div>
+        <div class="foot-sub">TECHNOLOGIES · EST. 2026</div>
+      </div>
+      <p class="foot-line">Precision compute engineered to a purpose. Signed, certified, shipped with a benchmark in every box.</p>
+    </div>
+    <div class="foot-col">
+      <div class="foot-k">Products</div>
+      <a href="products.html#lineup">Nucore Lite</a>
+      <a href="products.html#lineup">Nucore Pro</a>
+      <a href="products.html#lineup">Nucore Studio</a>
+      <a href="products.html#lineup">Nucore Lab</a>
+      <a href="products.html#lineup">Nucore Cluster</a>
+    </div>
+    <div class="foot-col">
+      <div class="foot-k">Engineering</div>
+      <a href="engineering.html#engineering">Four-Layer Process</a>
+      <a href="engineering.html#anatomy">Anatomy Hologram</a>
+      <a href="engineering.html#intelligence">Intelligence</a>
+      <a href="products.html#configurator">Certification</a>
+    </div>
+    <div class="foot-col">
+      <div class="foot-k">Company</div>
+      <a href="index.html#platform">Platform Vision</a>
+      <a href="index.html#platform">The Moat</a>
+      <a href="products.html#cta">Contact</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 Nucore Technologies. All units hand-certified.</span>
+    <span class="foot-bottom-r">MADE WITH PRECISION · NOT GENERIC</span>
+  </div>
+</footer>
+
+</main>
+
+<script src="https://unpkg.com/three@0.148.0/build/three.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
