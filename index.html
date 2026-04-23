@@ -13,10 +13,6 @@
 </head>
 <body>
 
-<!-- Cursor -->
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursor-ring"></div>
-
 <!-- Ambient background -->
 <div class="ambient">
   <div class="ambient-grid"></div>
@@ -33,6 +29,7 @@
     <span class="nav-sub">TECHNOLOGIES</span>
   </a>
   <nav class="nav-links">
+    <a href="#anatomy">Anatomy</a>
     <a href="#engineering">Engineering</a>
     <a href="#configurator">Configure</a>
     <a href="#lineup">Lineup</a>
@@ -104,6 +101,98 @@
       <em>We reject the compromise.</em>
       <span>Nucore builds one unit for one workload — tuned to its silicon, cooled for its load, certified for its life in production.</span>
     </p>
+  </div>
+</section>
+
+<!-- STATS BAND -->
+<section class="stats">
+  <div class="stats-head">
+    <div class="section-index">THE NUMBERS</div>
+    <h2 class="stats-title">Every unit <em>measured.</em> Every unit <em>signed.</em></h2>
+  </div>
+  <div class="stats-grid">
+    <div class="stat">
+      <div class="stat-k">THERMAL DELTA</div>
+      <div class="stat-v">-17<span>°C</span></div>
+      <div class="stat-b">Permanent reduction in sustained load temperature after Layer 02.</div>
+    </div>
+    <div class="stat">
+      <div class="stat-k">SOAK TEST</div>
+      <div class="stat-v">24<span>h</span></div>
+      <div class="stat-b">Combined stress test before any unit is certified or shipped.</div>
+    </div>
+    <div class="stat">
+      <div class="stat-k">ENGINEERING</div>
+      <div class="stat-v">4<span>layers</span></div>
+      <div class="stat-b">Intake · Thermal · Tuning · Software. Applied to every single unit.</div>
+    </div>
+    <div class="stat">
+      <div class="stat-k">GROSS MARGIN</div>
+      <div class="stat-v">45<span>%</span></div>
+      <div class="stat-b">Hardware tier — the on-ramp to the Nucore software platform.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 3D ANATOMY SHOWCASE -->
+<section class="anatomy" id="anatomy">
+  <div class="section-head">
+    <div class="section-index">ANATOMY · HOLOGRAM</div>
+    <h2 class="section-title">A Nucore unit, <em>deconstructed.</em></h2>
+    <p class="section-lede">Rotate the model with your mouse. Every labeled part is a deliberate engineering choice — not a default from the factory.</p>
+  </div>
+
+  <div class="anatomy-stage">
+    <canvas id="anatomy-canvas"></canvas>
+
+    <div class="anatomy-grid">
+      <div class="anatomy-side anatomy-left">
+        <button class="cout" data-cx="-42%" data-cy="22%" data-for="fans">
+          <em>01</em>
+          <strong>Custom Fan Curve</strong>
+          <span>Silent under light load. Ramps only under sustained demand.</span>
+        </button>
+        <button class="cout" data-cx="-40%" data-cy="52%" data-for="paste">
+          <em>02</em>
+          <strong>Thermal Grizzly Kryonaut</strong>
+          <span>Factory paste stripped with 99% IPA, replaced die-direct.</span>
+        </button>
+        <button class="cout" data-cx="-44%" data-cy="78%" data-for="pads">
+          <em>03</em>
+          <strong>Fujipoly XR-m Pads</strong>
+          <span>VRAM &amp; VRM pads measured with calipers, cut to spec.</span>
+        </button>
+      </div>
+      <div class="anatomy-side anatomy-right">
+        <button class="cout" data-cx="42%" data-cy="24%" data-for="led">
+          <em>04</em>
+          <strong>LED Diagnostic Strip</strong>
+          <span>Workload-aware color. Green for AI. Shifts with profile.</span>
+        </button>
+        <button class="cout" data-cx="40%" data-cy="54%" data-for="vf">
+          <em>05</em>
+          <strong>Per-Silicon VF Curve</strong>
+          <span>Undervolted to each chip's individual efficiency point.</span>
+        </button>
+        <button class="cout" data-cx="44%" data-cy="80%" data-for="soft">
+          <em>06</em>
+          <strong>Pre-Verified Software Stack</strong>
+          <span>CUDA, PyTorch, Ollama, signed and auto-loading on boot.</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="anatomy-hud">
+      <div class="ah-row"><span class="ah-k">MODEL</span><span class="ah-v" id="anatomy-model">Nucore Pro · RTX 4090</span></div>
+      <div class="ah-row"><span class="ah-k">STATE</span><span class="ah-v" id="anatomy-state">Holographic view · 1.0×</span></div>
+      <div class="ah-row"><span class="ah-k">FOCUS</span><span class="ah-v" id="anatomy-focus">— full assembly</span></div>
+    </div>
+
+    <div class="anatomy-controls">
+      <button class="ac-btn active" data-view="full"><em>FULL</em><span>Assembly</span></button>
+      <button class="ac-btn" data-view="exploded"><em>EXPLODED</em><span>Components</span></button>
+      <button class="ac-btn" data-view="thermal"><em>THERMAL</em><span>Heat map</span></button>
+    </div>
   </div>
 </section>
 

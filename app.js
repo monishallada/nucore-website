@@ -14,32 +14,6 @@
   const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* --------------------------------------------------------
-     Cursor
-     -------------------------------------------------------- */
-  const cursor = $('#cursor');
-  const cursorRing = $('#cursor-ring');
-  let cX = window.innerWidth / 2, cY = window.innerHeight / 2;
-  let rX = cX, rY = cY;
-  if (cursor && cursorRing) {
-    window.addEventListener('pointermove', (e) => {
-      cX = e.clientX; cY = e.clientY;
-      cursor.style.transform = `translate(${cX}px,${cY}px) translate(-50%,-50%)`;
-    }, { passive: true });
-    const loop = () => {
-      rX = lerp(rX, cX, 0.18);
-      rY = lerp(rY, cY, 0.18);
-      cursorRing.style.transform = `translate(${rX}px,${rY}px) translate(-50%,-50%)`;
-      requestAnimationFrame(loop);
-    };
-    loop();
-    const addHover = (sel) => $$(sel).forEach((el) => {
-      el.addEventListener('pointerenter', () => cursorRing.classList.add('hover'));
-      el.addEventListener('pointerleave', () => cursorRing.classList.remove('hover'));
-    });
-    addHover('a, button, .opt, input, select, .tilt, .prod, .stream, .seg, .moat-item');
-  }
-
-  /* --------------------------------------------------------
      Nav scroll state
      -------------------------------------------------------- */
   const nav = $('#nav');
@@ -326,10 +300,10 @@
     const stage = new THREE.Group();
     scene.add(stage);
 
-    const gpu = makeGPU({ scale: 1.12 });
+    const gpu = makeGPU({ scale: 1.45 });
     stage.add(gpu);
     addHoloRings(stage);
-    addParticleField(scene, 420, 16);
+    addParticleField(scene, 520, 18);
 
     let mx = 0, my = 0, tMx = 0, tMy = 0;
     window.addEventListener('pointermove', (e) => {
@@ -474,6 +448,172 @@
       // Certification — Layer 4 camera gentle zoom
       const tZ = activeLayer === 4 ? 6.2 : 7;
       camera.position.z = lerp(camera.position.z, tZ, 0.04);
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    };
+    animate();
+  }
+
+  /* --------------------------------------------------------
+     ANATOMY scene — huge hologram with modes
+     -------------------------------------------------------- */
+  function initAnatomy() {
+    const canvas = $('#anatomy-canvas');
+    if (!canvas) return;
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 60);
+    camera.position.set(0, 1.1, 8.4);
+    camera.lookAt(0, 0.1, 0);
+    setupLights(scene);
+    addParticleField(scene, 520, 18);
+
+    const stage = new THREE.Group();
+    scene.add(stage);
+    addHoloRings(stage);
+
+    const gpu = makeGPU({ scale: 1.45 });
+    stage.add(gpu);
+    const card = gpu.userData.cards[0];
+    const shroud = card.children[1];
+    const fins = card.children.slice(2, 20);
+    const fans = card.userData.fans;
+    const ledStrip = card.userData.ledStrip;
+
+    // Orbit drag
+    let mx = 0, my = 0, tMx = 0, tMy = 0;
+    let dragging = false, dragX = 0, dragY = 0, yawOffset = 0, pitchOffset = 0;
+    canvas.addEventListener('pointerdown', (e) => {
+      dragging = true; dragX = e.clientX; dragY = e.clientY;
+      canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (dragging) {
+        yawOffset += (e.clientX - dragX) * 0.008;
+        pitchOffset = clamp(pitchOffset + (e.clientY - dragY) * 0.005, -0.6, 0.6);
+        dragX = e.clientX; dragY = e.clientY;
+      } else {
+        const r = canvas.getBoundingClientRect();
+        tMx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+        tMy = ((e.clientY - r.top) / r.height - 0.5) * 2;
+      }
+    });
+    canvas.addEventListener('pointerup', () => (dragging = false));
+    canvas.addEventListener('pointerleave', () => (dragging = false));
+
+    // Thermal overlay (additive sprites over the card)
+    const thermalDots = new THREE.Group();
+    const thermMat = (hex) => new THREE.MeshBasicMaterial({
+      color: hex, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false
+    });
+    const thermGeo = new THREE.SphereGeometry(0.28, 16, 16);
+    const hotSpots = [
+      [-0.6, 0.5, 0, 0xff5a33],
+      [0.6, 0.5, 0, 0xff884a],
+      [-1.1, 0.4, 0.2, 0xffaa55],
+      [1.1, 0.4, -0.2, 0xffaa55],
+      [0, 0.2, 0, 0xff8f3a]
+    ];
+    const thermMeshes = hotSpots.map(([x, y, z, c]) => {
+      const m = new THREE.Mesh(thermGeo, thermMat(c));
+      m.position.set(x, y, z);
+      m.scale.setScalar(1.6);
+      thermalDots.add(m);
+      return m;
+    });
+    card.add(thermalDots);
+
+    // State
+    let mode = 'full';
+    const setMode = (m) => {
+      mode = m;
+      const focus = $('#anatomy-focus');
+      const state = $('#anatomy-state');
+      if (state) state.textContent = m === 'full' ? 'Holographic view · 1.0×'
+                                  : m === 'exploded' ? 'Exploded components · deconstructed'
+                                  : 'Thermal overlay · post-Layer 02';
+      if (focus) focus.textContent = m === 'full' ? '— full assembly'
+                                  : m === 'exploded' ? '— component separation'
+                                  : '— die 66°C · vram 78°C';
+    };
+    $$('.ac-btn').forEach((b) => {
+      b.addEventListener('click', () => {
+        $$('.ac-btn').forEach((x) => x.classList.remove('active'));
+        b.classList.add('active');
+        setMode(b.dataset.view);
+      });
+    });
+
+    // Callout hover — highlight corresponding part
+    const highlight = { fans: false, led: false, pads: false, paste: false, vf: false, soft: false };
+    $$('.cout').forEach((el) => {
+      const key = el.dataset.for;
+      const focus = $('#anatomy-focus');
+      el.addEventListener('pointerenter', () => {
+        highlight[key] = true;
+        if (focus) focus.textContent = '→ ' + el.querySelector('strong').textContent;
+      });
+      el.addEventListener('pointerleave', () => {
+        highlight[key] = false;
+        if (focus) focus.textContent = mode === 'full' ? '— full assembly'
+                                     : mode === 'exploded' ? '— component separation'
+                                     : '— die 66°C · vram 78°C';
+      });
+    });
+
+    const resize = () => {
+      const r = canvas.getBoundingClientRect();
+      renderer.setSize(r.width, r.height, false);
+      camera.aspect = r.width / r.height;
+      camera.updateProjectionMatrix();
+    };
+    new ResizeObserver(resize).observe(canvas);
+    resize();
+
+    const clock = new THREE.Clock();
+    const animate = () => {
+      const t = clock.getElapsedTime();
+      mx = lerp(mx, tMx, 0.05);
+      my = lerp(my, tMy, 0.05);
+
+      gpu.rotation.y = lerp(gpu.rotation.y, t * 0.12 + yawOffset + mx * 0.25, 0.1);
+      gpu.rotation.x = lerp(gpu.rotation.x, Math.sin(t * 0.4) * 0.05 + pitchOffset - my * 0.15, 0.1);
+      gpu.position.y = Math.sin(t * 0.7) * 0.05;
+
+      // Exploded state
+      const ex = mode === 'exploded' ? 1 : 0;
+      shroud.position.y = lerp(shroud.position.y, 0.35 + ex * 1.3, 0.08);
+      fins.forEach((fin, i) => {
+        const base = -0.55 + i * 0.062;
+        const spread = ex ? (i - fins.length / 2) * 0.11 : 0;
+        const targetZ = base + spread;
+        fin.position.z = lerp(fin.position.z, targetZ, 0.08);
+        fin.position.y = lerp(fin.position.y, 0.35 + ex * 0.55, 0.08);
+      });
+      fans.forEach((f, i) => {
+        const tx = ex ? (i === 0 ? -2.2 : 2.2) : (i === 0 ? -1.1 : 1.1);
+        const ty = ex ? 1.6 : 0.65;
+        f.position.x = lerp(f.position.x, tx, 0.08);
+        f.position.y = lerp(f.position.y, ty, 0.08);
+        const spin = 0.3 + (highlight.fans ? 0.2 : 0);
+        f.rotation.y -= spin;
+      });
+
+      // Thermal overlay
+      const tOn = mode === 'thermal' ? 1 : 0;
+      thermMeshes.forEach((m, i) => {
+        const base = 0.45 + Math.sin(t * 1.5 + i) * 0.15;
+        m.material.opacity = lerp(m.material.opacity, tOn * base, 0.1);
+        m.scale.setScalar(lerp(m.scale.x, tOn * (1.4 + Math.sin(t * 2 + i) * 0.3), 0.1));
+      });
+
+      // LED pulse when led callout hovered
+      if (ledStrip && ledStrip.material) {
+        const tgt = highlight.led ? 0.6 + Math.abs(Math.sin(t * 4)) * 0.4 : 0.85;
+        ledStrip.material.opacity = lerp(ledStrip.material.opacity, tgt, 0.12);
+      }
 
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
@@ -786,6 +926,7 @@
      -------------------------------------------------------- */
   const boot = () => {
     try { initHero(); } catch (e) { console.warn('hero', e); }
+    try { initAnatomy(); } catch (e) { console.warn('anatomy', e); }
     try { initLayers(); } catch (e) { console.warn('layers', e); }
     try { initConfigurator(); } catch (e) { console.warn('cfg', e); }
     initFanBars();
