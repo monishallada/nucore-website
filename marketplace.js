@@ -62,6 +62,26 @@
 
   function img(category, accent) { return svgArt(category, accent); }
 
+  // Build an <img> tag that tries to load a real product photo from
+  //   assets/marketplace/{id}[-n].(jpg|png|webp)
+  // and falls back gracefully to the SVG illustration if the file isn't there.
+  // Drop real photos into assets/marketplace/ with the listed filenames and
+  // they'll appear automatically — no code changes needed.
+  function productImg(p, variant) {
+    const v = variant ? `-${variant}` : "";
+    const fallback = svgArt(p.category);
+    // Try jpg → png → webp → svg fallback.
+    const onerr =
+      `this.onerror=function(){` +
+        `this.onerror=function(){` +
+          `this.onerror=null;this.src='${fallback}';this.classList.add('mk-img-fallback');` +
+        `};` +
+        `this.src='assets/marketplace/${p.id}${v}.webp';` +
+      `};` +
+      `this.src='assets/marketplace/${p.id}${v}.png';`;
+    return `<img src="assets/marketplace/${p.id}${v}.jpg" alt="${p.name}" loading="lazy" onerror="${onerr}"/>`;
+  }
+
   // ----- Product Catalog -----
   const PRODUCTS = [
     {
@@ -321,8 +341,6 @@
     }
   ];
 
-  // attach an SVG image to each product
-  PRODUCTS.forEach((p) => { p.image = img(p.category); });
 
   // ----- State -----
   const state = { cat: "all", sort: "featured" };
@@ -381,7 +399,7 @@
     return `
       <article class="mk-card" data-open="${p.id}" tabindex="0" role="button" aria-label="View ${p.name}">
         <div class="mk-card-media">
-          <img src="${p.image}" alt="" loading="lazy"/>
+          ${productImg(p)}
           <span class="mk-card-cat">${p.categoryLabel}</span>
         </div>
         <div class="mk-card-body">
@@ -419,22 +437,20 @@
     );
     const mailto = `mailto:${SALES_EMAIL}?subject=${subject}&body=${body}`;
 
-    // gallery: 1 main + 2 alt placeholder views (different accents for variety)
-    const gallery = [
-      img(p.category, "#82e0ff"),
-      img(p.category, "#b6f0ff"),
-      img(p.category, "#58d4ff")
-    ];
+    // gallery: primary photo + 2 alternate angles. Variants are loaded from
+    //   assets/marketplace/{id}.jpg, {id}-2.jpg, {id}-3.jpg
+    // with automatic SVG fallback if a file isn't present yet.
+    const variants = ["", "2", "3"];
 
     $modalBody.innerHTML = `
       <div class="mk-detail">
         <div class="mk-detail-gallery">
-          <div class="mk-detail-main">
-            <img id="mk-detail-main-img" src="${gallery[0]}" alt=""/>
+          <div class="mk-detail-main" id="mk-detail-main">
+            ${productImg(p)}
             <span class="mk-card-cat">${p.categoryLabel}</span>
           </div>
           <div class="mk-detail-thumbs">
-            ${gallery.map((g, i) => `<button class="mk-thumb${i === 0 ? " is-active" : ""}" data-src="${g}" aria-label="View image ${i + 1}"><img src="${g}" alt=""/></button>`).join("")}
+            ${variants.map((v, i) => `<button class="mk-thumb${i === 0 ? " is-active" : ""}" data-variant="${v}" aria-label="View image ${i + 1}">${productImg(p, v)}</button>`).join("")}
           </div>
         </div>
         <div class="mk-detail-info">
@@ -466,11 +482,12 @@
         </div>
       </div>`;
 
-    // thumb switching
+    // thumb switching — replace the main image markup so onerror fallbacks work
+    const $main = document.getElementById("mk-detail-main");
     $modalBody.querySelectorAll(".mk-thumb").forEach((t) => {
       t.addEventListener("click", () => {
-        const src = t.getAttribute("data-src");
-        document.getElementById("mk-detail-main-img").src = src;
+        const v = t.getAttribute("data-variant");
+        $main.innerHTML = `${productImg(p, v)}<span class="mk-card-cat">${p.categoryLabel}</span>`;
         $modalBody.querySelectorAll(".mk-thumb").forEach((x) => x.classList.remove("is-active"));
         t.classList.add("is-active");
       });
