@@ -83,24 +83,27 @@
     const buildOne = (xOffset = 0) => {
       const card = new THREE.Group();
 
-      // PCB
+      // ---------- PCB substrate (children[0]) ----------
+      // Layered look: dark substrate with a faint copper trace tint via emissive
       const pcbMat = new THREE.MeshStandardMaterial({
-        color: 0x0f1114, metalness: 0.7, roughness: 0.55, emissive: 0x0b0d10, emissiveIntensity: 0.4
+        color: 0x0e131a, metalness: 0.55, roughness: 0.7,
+        emissive: 0x081420, emissiveIntensity: 0.55
       });
       const pcb = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.18, 1.3), pcbMat);
       card.add(pcb);
 
-      // Shroud
+      // ---------- Shroud (children[1]) ----------
       const shroudMat = new THREE.MeshStandardMaterial({
-        color: 0x17191d, metalness: 0.8, roughness: 0.35, emissive: 0x0a0c0f, emissiveIntensity: 0.3
+        color: 0x17191d, metalness: 0.85, roughness: 0.32,
+        emissive: 0x0a0c0f, emissiveIntensity: 0.3
       });
       const shroud = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.55, 1.22), shroudMat);
       shroud.position.y = 0.35;
       card.add(shroud);
 
-      // Heatsink fins (stack)
+      // ---------- Heatsink fins (children[2..19]) ----------
       const finMat = new THREE.MeshStandardMaterial({
-        color: 0x2a2e33, metalness: 0.9, roughness: 0.25
+        color: 0x2a2e33, metalness: 0.92, roughness: 0.22
       });
       for (let i = 0; i < 18; i++) {
         const fin = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.48, 0.035), finMat);
@@ -108,7 +111,305 @@
         card.add(fin);
       }
 
-      // Fans (cylinders)
+      // ---------- Dynamic / detailed components (added AFTER fins) ----------
+      const dynamic = {
+        die: null,           // GPU die mesh (emissive pulse)
+        dieRim: null,        // IHS rim
+        memChips: [],        // GDDR memory packages
+        vrmInductors: [],    // VRM phase chokes (sequential glow)
+        vrmCores: [],        // glowing cores inside inductors
+        traceLines: [],      // animated PCB traces
+        powerLed: null,      // 12VHPWR power LED
+        nvlinkFingers: [],
+        pcieFingers: [],     // gold fingers shimmer
+        capacitors: []
+      };
+
+      // PCB top surface helper plane (sits just above PCB so components don't z-fight)
+      const PCB_TOP = 0.095; // half-PCB height + small offset
+
+      // ---------- GPU DIE PACKAGE (centerpiece) ----------
+      // Substrate (green/black square the die sits on)
+      const subMat = new THREE.MeshStandardMaterial({
+        color: 0x0a1f12, metalness: 0.4, roughness: 0.55,
+        emissive: 0x062818, emissiveIntensity: 0.4
+      });
+      const substrate = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.05, 1.0), subMat);
+      substrate.position.set(0, PCB_TOP + 0.025, 0);
+      card.add(substrate);
+
+      // IHS rim (metal frame around die)
+      const ihsMat = new THREE.MeshStandardMaterial({
+        color: 0xb4b8c0, metalness: 0.95, roughness: 0.18
+      });
+      const ihsRim = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.06, 0.78), ihsMat);
+      ihsRim.position.set(0, PCB_TOP + 0.06, 0);
+      card.add(ihsRim);
+      dynamic.dieRim = ihsRim;
+
+      // The die itself (glowing chip)
+      const dieMat = new THREE.MeshStandardMaterial({
+        color: 0x051820, metalness: 0.5, roughness: 0.35,
+        emissive: col, emissiveIntensity: 0.85
+      });
+      const die = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.04, 0.62), dieMat);
+      die.position.set(0, PCB_TOP + 0.082, 0);
+      card.add(die);
+      dynamic.die = die;
+
+      // Die surface "circuit grid" — additive thin lines on top of die
+      const dieGridMat = new THREE.MeshBasicMaterial({
+        color: col, transparent: true, opacity: 0.55,
+        blending: THREE.AdditiveBlending, depthWrite: false
+      });
+      for (let g = 0; g < 6; g++) {
+        const ln = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.001, 0.008), dieGridMat);
+        ln.position.set(0, PCB_TOP + 0.105, -0.25 + g * 0.1);
+        card.add(ln);
+      }
+      for (let g = 0; g < 6; g++) {
+        const ln = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.001, 0.58), dieGridMat);
+        ln.position.set(-0.25 + g * 0.1, PCB_TOP + 0.105, 0);
+        card.add(ln);
+      }
+
+      // ---------- GDDR6X MEMORY ARRAY (12 chips around die) ----------
+      const memMat = new THREE.MeshStandardMaterial({
+        color: 0x0c0e12, metalness: 0.6, roughness: 0.35,
+        emissive: 0x101418, emissiveIntensity: 0.5
+      });
+      // U-shape around die: top row, bottom row, side columns
+      const memSlots = [
+        // top row of 4
+        [-0.55, 0.78], [-0.18, 0.78], [0.18, 0.78], [0.55, 0.78],
+        // bottom row of 4
+        [-0.55, -0.78], [-0.18, -0.78], [0.18, -0.78], [0.55, -0.78],
+        // left column of 2
+        [-0.78, 0.32], [-0.78, -0.32],
+        // right column of 2
+        [0.78, 0.32], [0.78, -0.32]
+      ];
+      memSlots.forEach(([mx, mz]) => {
+        const horizontal = Math.abs(mx) < 0.7;
+        const w = horizontal ? 0.28 : 0.18;
+        const d = horizontal ? 0.18 : 0.28;
+        const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.05, d), memMat.clone());
+        m.position.set(mx, PCB_TOP + 0.025, mz);
+        card.add(m);
+        dynamic.memChips.push(m);
+
+        // tiny solder dots (silver) under each chip — visual texture
+        const dotMat = new THREE.MeshStandardMaterial({
+          color: 0xc9ccd2, metalness: 0.95, roughness: 0.25
+        });
+        const dotGeo = new THREE.BoxGeometry(w * 0.85, 0.005, d * 0.85);
+        const dot = new THREE.Mesh(dotGeo, dotMat);
+        dot.position.set(mx, PCB_TOP + 0.001, mz);
+        card.add(dot);
+      });
+
+      // ---------- VRM PHASES (right side — inductor chokes + MOSFETs) ----------
+      // Inductor body (dark) with a glowing ferrite core
+      const indBodyMat = new THREE.MeshStandardMaterial({
+        color: 0x1a1d22, metalness: 0.7, roughness: 0.45
+      });
+      const indCoreMat = () => new THREE.MeshStandardMaterial({
+        color: 0x141618, metalness: 0.6, roughness: 0.55,
+        emissive: col, emissiveIntensity: 0.4
+      });
+      const mosfetMat = new THREE.MeshStandardMaterial({
+        color: 0x0a0c0f, metalness: 0.6, roughness: 0.4
+      });
+
+      // 8 VRM phases stacked along the right edge of PCB
+      for (let p = 0; p < 8; p++) {
+        const py = -0.42 + p * 0.12;
+        // inductor body
+        const ind = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.08, 0.1), indBodyMat);
+        ind.position.set(1.45, PCB_TOP + 0.04, py);
+        card.add(ind);
+        dynamic.vrmInductors.push(ind);
+        // glowing core (visible ferrite cap on top)
+        const coreM = indCoreMat();
+        const core = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.02, 0.07), coreM);
+        core.position.set(1.45, PCB_TOP + 0.085, py);
+        card.add(core);
+        dynamic.vrmCores.push(core);
+        // pair of MOSFETs next to each inductor
+        for (let mf = 0; mf < 2; mf++) {
+          const ms = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.025, 0.06), mosfetMat);
+          ms.position.set(1.28 + mf * 0.07, PCB_TOP + 0.0125, py);
+          card.add(ms);
+        }
+      }
+
+      // ---------- LEFT-SIDE VRM (smaller, for memory power) ----------
+      for (let p = 0; p < 4; p++) {
+        const py = -0.32 + p * 0.21;
+        const ind = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.07, 0.08), indBodyMat);
+        ind.position.set(-1.42, PCB_TOP + 0.035, py);
+        card.add(ind);
+        dynamic.vrmInductors.push(ind);
+        const coreM = indCoreMat();
+        const core = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.02, 0.05), coreM);
+        core.position.set(-1.42, PCB_TOP + 0.075, py);
+        card.add(core);
+        dynamic.vrmCores.push(core);
+      }
+
+      // ---------- CAPACITORS (rows of small SMDs) ----------
+      const capMat = new THREE.MeshStandardMaterial({
+        color: 0xc0a060, metalness: 0.7, roughness: 0.35,
+        emissive: 0x261a08, emissiveIntensity: 0.3
+      });
+      // capacitor row below GPU die
+      for (let i = 0; i < 14; i++) {
+        const cap = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.025, 0.08), capMat);
+        cap.position.set(-0.65 + i * 0.1, PCB_TOP + 0.0125, 0.6);
+        card.add(cap);
+        dynamic.capacitors.push(cap);
+      }
+      // capacitor row above
+      for (let i = 0; i < 14; i++) {
+        const cap = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.025, 0.08), capMat);
+        cap.position.set(-0.65 + i * 0.1, PCB_TOP + 0.0125, -0.6);
+        card.add(cap);
+        dynamic.capacitors.push(cap);
+      }
+      // small SMD speckle around inductors
+      const smdMat = new THREE.MeshStandardMaterial({
+        color: 0x14181c, metalness: 0.5, roughness: 0.5
+      });
+      for (let s = 0; s < 40; s++) {
+        const sm = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.012, 0.02), smdMat);
+        const sx = 1.05 + Math.random() * 0.7;
+        const sz = -0.55 + Math.random() * 1.1;
+        sm.position.set(sx, PCB_TOP + 0.006, sz);
+        card.add(sm);
+      }
+
+      // ---------- 12VHPWR POWER CONNECTOR (top edge) ----------
+      const pwrBodyMat = new THREE.MeshStandardMaterial({
+        color: 0x0a0c0f, metalness: 0.7, roughness: 0.4
+      });
+      const pwrBody = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.12, 0.18), pwrBodyMat);
+      pwrBody.position.set(0.5, PCB_TOP + 0.06, -0.55);
+      card.add(pwrBody);
+      // 6 gold pins
+      const pinMat = new THREE.MeshStandardMaterial({
+        color: 0xf6c46a, metalness: 0.95, roughness: 0.25
+      });
+      for (let p = 0; p < 6; p++) {
+        const pin = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.04, 0.04), pinMat);
+        pin.position.set(0.34 + p * 0.06, PCB_TOP + 0.04, -0.55);
+        card.add(pin);
+      }
+      // power-on LED next to connector
+      const pwrLedMat = new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.95 });
+      const pwrLed = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.02, 0.03), pwrLedMat);
+      pwrLed.position.set(0.78, PCB_TOP + 0.015, -0.55);
+      card.add(pwrLed);
+      dynamic.powerLed = pwrLed;
+
+      // ---------- NVLINK FINGERS (top edge, right side) ----------
+      const nvlinkMat = new THREE.MeshStandardMaterial({
+        color: 0xf6c46a, metalness: 0.95, roughness: 0.2,
+        emissive: 0x4a3008, emissiveIntensity: 0.35
+      });
+      for (let n = 0; n < 14; n++) {
+        const f = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.018, 0.06), nvlinkMat);
+        f.position.set(1.0 + n * 0.04, PCB_TOP + 0.009, -0.6);
+        card.add(f);
+        dynamic.nvlinkFingers.push(f);
+      }
+
+      // ---------- PCIe GOLD FINGERS (bottom edge) ----------
+      const pcieMat = new THREE.MeshStandardMaterial({
+        color: 0xf3c060, metalness: 0.95, roughness: 0.22,
+        emissive: 0x4a3408, emissiveIntensity: 0.4
+      });
+      // 30 contacts in two banks (PCIe x16)
+      for (let n = 0; n < 22; n++) {
+        const f = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.012, 0.05), pcieMat);
+        f.position.set(-0.7 + n * 0.065, -0.075, 0.62);
+        card.add(f);
+        dynamic.pcieFingers.push(f);
+      }
+
+      // ---------- DISPLAY IO (HDMI + 3 DP) ----------
+      // backplate dark frame (this REPLACES the simple IO at left end)
+      const ioBracketMat = new THREE.MeshStandardMaterial({
+        color: 0x0d0f12, metalness: 0.85, roughness: 0.35
+      });
+      const ioBracket = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.6, 1.22), ioBracketMat);
+      ioBracket.position.set(-1.76, 0.18, 0);
+      card.add(ioBracket);
+      // HDMI port
+      const hdmiMat = new THREE.MeshStandardMaterial({
+        color: 0x141821, metalness: 0.7, roughness: 0.4,
+        emissive: 0x0a1422, emissiveIntensity: 0.4
+      });
+      const hdmi = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.09, 0.18), hdmiMat);
+      hdmi.position.set(-1.79, 0.42, 0.45);
+      card.add(hdmi);
+      // 3 DisplayPorts
+      for (let dp = 0; dp < 3; dp++) {
+        const port = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.07, 0.13), hdmiMat);
+        port.position.set(-1.79, 0.42, 0.18 - dp * 0.18);
+        card.add(port);
+      }
+      // vent grid on bracket (small slats)
+      for (let v = 0; v < 8; v++) {
+        const slat = new THREE.Mesh(
+          new THREE.BoxGeometry(0.04, 0.04, 0.06),
+          new THREE.MeshStandardMaterial({ color: 0x0a0c0f, metalness: 0.5, roughness: 0.7 })
+        );
+        slat.position.set(-1.79, -0.02 + Math.floor(v / 4) * 0.06, -0.55 + (v % 4) * 0.16);
+        card.add(slat);
+      }
+
+      // ---------- BACKPLATE (under PCB) ----------
+      const backplateMat = new THREE.MeshStandardMaterial({
+        color: 0x16191d, metalness: 0.9, roughness: 0.3
+      });
+      const backplate = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.04, 1.25), backplateMat);
+      backplate.position.set(0, -0.13, 0);
+      card.add(backplate);
+      // backplate cutout pattern — 6 small triangular cutouts simulated as dark squares
+      const cutoutMat = new THREE.MeshStandardMaterial({
+        color: 0x05060a, metalness: 0.5, roughness: 0.6,
+        emissive: col, emissiveIntensity: 0.18
+      });
+      for (let cz = 0; cz < 6; cz++) {
+        const co = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.005, 0.18), cutoutMat);
+        co.position.set(-0.9 + cz * 0.36, -0.115, 0);
+        card.add(co);
+      }
+
+      // ---------- COLD PLATE / VAPOR CHAMBER over die ----------
+      const platMat = new THREE.MeshStandardMaterial({
+        color: 0x9aa1ad, metalness: 0.95, roughness: 0.2
+      });
+      const coldplate = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.05, 1.2), platMat);
+      coldplate.position.set(0, 0.12, 0);
+      card.add(coldplate);
+
+      // ---------- HEATPIPES (copper tubes arching across fins) ----------
+      const pipeMat = new THREE.MeshStandardMaterial({
+        color: 0xc0743a, metalness: 0.95, roughness: 0.22,
+        emissive: 0x4a1f0c, emissiveIntensity: 0.3
+      });
+      for (let h = 0; h < 5; h++) {
+        const pipe = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.035, 0.035, 3.0, 16),
+          pipeMat
+        );
+        pipe.rotation.z = Math.PI / 2;
+        pipe.position.set(0, 0.18 + h * 0.04, -0.5 + h * 0.25);
+        card.add(pipe);
+      }
+
+      // ---------- FANS (preserve userData.fans for animations) ----------
       const fanHubMat = new THREE.MeshStandardMaterial({
         color: 0x0a0c0f, metalness: 0.9, roughness: 0.2,
         emissive: col, emissiveIntensity: 0.55
@@ -125,7 +426,11 @@
         const ring = new THREE.Mesh(new THREE.TorusGeometry(0.44, 0.04, 16, 36), fanRingMat);
         ring.rotation.x = Math.PI / 2;
         fanGroup.add(ring);
-        // blades
+        // outer ring detail
+        const outerRing = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.018, 8, 36), fanRingMat);
+        outerRing.rotation.x = Math.PI / 2;
+        fanGroup.add(outerRing);
+        // 9 blades with subtle curve (using rotated thin boxes — keeps geometry cheap)
         for (let b = 0; b < 9; b++) {
           const blade = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.02, 0.16), bladesMat);
           blade.rotation.y = (b / 9) * Math.PI * 2;
@@ -134,35 +439,99 @@
         }
         const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.08, 24), fanHubMat);
         fanGroup.add(hub);
+        // hub logo dot
+        const hubDot = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.05, 0.05, 0.082, 16),
+          new THREE.MeshBasicMaterial({ color: col })
+        );
+        fanGroup.add(hubDot);
         fanGroup.position.set(fx, 0.65, 0);
         fanGroup.userData.fan = true;
         fans.push(fanGroup);
         card.add(fanGroup);
       });
 
-      // Glow strip along top edge
+      // ---------- GLOW STRIPS (preserve userData.ledStrip / strip) ----------
       const stripMat = new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.92 });
       const strip = new THREE.Mesh(new THREE.BoxGeometry(3.35, 0.035, 0.045), stripMat);
       strip.position.set(0, 0.635, -0.6);
       card.add(strip);
-
-      // Side strip (brand mark analogue)
+      // side accent strip
       const side = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.45, 0.1), stripMat);
       side.position.set(1.72, 0.35, 0);
       card.add(side);
 
-      // Display/IO (dark end)
-      const io = new THREE.Mesh(
-        new THREE.BoxGeometry(0.1, 0.55, 1.22),
-        new THREE.MeshStandardMaterial({ color: 0x0b0d10, metalness: 0.8, roughness: 0.4 })
-      );
-      io.position.set(-1.76, 0.35, 0);
-      card.add(io);
+      // ---------- ENERGY TRACES (additive lines flowing from VRM → die → memory) ----------
+      const traceMat = () => new THREE.MeshBasicMaterial({
+        color: col, transparent: true, opacity: 0.0,
+        blending: THREE.AdditiveBlending, depthWrite: false
+      });
+      // VRM → die traces (right side)
+      const traceTargets = [
+        { from: [1.4, 0], len: 1.0, axis: 'x', sign: -1 },
+        { from: [1.4, 0.3], len: 1.0, axis: 'x', sign: -1 },
+        { from: [1.4, -0.3], len: 1.0, axis: 'x', sign: -1 },
+        { from: [-1.4, 0], len: 1.0, axis: 'x', sign: 1 },
+        // die → memory (top)
+        { from: [0, -0.4], len: 0.36, axis: 'z', sign: -1 },
+        { from: [0, 0.4], len: 0.36, axis: 'z', sign: 1 }
+      ];
+      traceTargets.forEach((t) => {
+        const m = traceMat();
+        const isX = t.axis === 'x';
+        const geom = new THREE.BoxGeometry(isX ? t.len : 0.012, 0.002, isX ? 0.012 : t.len);
+        const ln = new THREE.Mesh(geom, m);
+        const cx = isX ? t.from[0] + t.sign * t.len / 2 : t.from[0];
+        const cz = isX ? t.from[1] : t.from[1] + t.sign * t.len / 2;
+        ln.position.set(cx, PCB_TOP + 0.003, cz);
+        card.add(ln);
+        dynamic.traceLines.push(ln);
+      });
 
       card.position.x = xOffset;
       card.userData.fans = fans;
       card.userData.strip = stripMat;
       card.userData.ledStrip = strip;
+      card.userData.dynamic = dynamic;
+
+      // tick(t) — called from animate loops to drive component-level life
+      card.userData.tick = (t) => {
+        // Die emissive pulse (synchronized heart-rate of the chip)
+        if (dynamic.die && dynamic.die.material) {
+          dynamic.die.material.emissiveIntensity = 0.7 + Math.sin(t * 2.4) * 0.35 + Math.abs(Math.sin(t * 6.0)) * 0.15;
+        }
+        // VRM phase rotation — light up cores in sequence (8-phase rotor)
+        const phaseCount = dynamic.vrmCores.length;
+        const phaseSpeed = 6.0; // Hz-ish
+        dynamic.vrmCores.forEach((core, i) => {
+          const phase = (t * phaseSpeed + i * (Math.PI * 2 / phaseCount)) % (Math.PI * 2);
+          const lit = Math.max(0, Math.cos(phase));
+          core.material.emissiveIntensity = 0.35 + lit * 0.9;
+        });
+        // PCIe finger shimmer (left-to-right wave)
+        dynamic.pcieFingers.forEach((f, i) => {
+          const wave = Math.sin(t * 3 - i * 0.25);
+          f.material.emissiveIntensity = 0.35 + Math.max(0, wave) * 0.8;
+        });
+        // NVLink subtle pulse
+        dynamic.nvlinkFingers.forEach((f, i) => {
+          f.material.emissiveIntensity = 0.3 + Math.abs(Math.sin(t * 1.6 + i * 0.4)) * 0.5;
+        });
+        // Memory thermal pulse (slow warm-up wave)
+        dynamic.memChips.forEach((m, i) => {
+          m.material.emissiveIntensity = 0.4 + Math.sin(t * 1.2 + i * 0.7) * 0.18;
+        });
+        // Energy trace flow — sweep alpha along each trace
+        dynamic.traceLines.forEach((ln, i) => {
+          const flow = (Math.sin(t * 4 - i * 0.8) + 1) / 2;
+          ln.material.opacity = 0.15 + flow * 0.55;
+        });
+        // Power LED breath
+        if (dynamic.powerLed) {
+          dynamic.powerLed.material.opacity = 0.6 + Math.abs(Math.sin(t * 2.2)) * 0.4;
+        }
+      };
+
       return card;
     };
 
@@ -262,23 +631,121 @@
 
   function addHoloRings(group, color = GREEN_BRIGHT) {
     const rings = new THREE.Group();
-    const mat = new THREE.MeshBasicMaterial({
-      color, transparent: true, opacity: 0.25, side: THREE.DoubleSide
+    rings.userData.tick = null;
+
+    // Multiple concentric thin rings
+    const ringMatBright = new THREE.MeshBasicMaterial({
+      color, transparent: true, opacity: 0.45, side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending, depthWrite: false
     });
-    for (let i = 0; i < 3; i++) {
-      const r = 2.2 + i * 0.25;
-      const ring = new THREE.Mesh(new THREE.RingGeometry(r, r + 0.01, 64), mat);
+    const ringMatDim = new THREE.MeshBasicMaterial({
+      color, transparent: true, opacity: 0.18, side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending, depthWrite: false
+    });
+    const radii = [2.0, 2.18, 2.4, 2.62, 2.85, 3.05];
+    radii.forEach((r, i) => {
+      const ring = new THREE.Mesh(
+        new THREE.RingGeometry(r, r + (i % 2 === 0 ? 0.012 : 0.005), 96),
+        i % 2 === 0 ? ringMatBright : ringMatDim
+      );
       ring.rotation.x = Math.PI / 2;
-      ring.position.y = -0.55 + i * 0.02;
+      ring.position.y = -0.58 + i * 0.005;
       rings.add(ring);
-    }
-    const gridMat = new THREE.MeshBasicMaterial({
-      color, transparent: true, opacity: 0.08, side: THREE.DoubleSide, wireframe: true
     });
-    const pad = new THREE.Mesh(new THREE.CircleGeometry(3, 48), gridMat);
+
+    // Tick-mark ring (small radial dashes around outer ring) — counter-rotates
+    const tickMat = new THREE.MeshBasicMaterial({
+      color, transparent: true, opacity: 0.6,
+      blending: THREE.AdditiveBlending, depthWrite: false
+    });
+    const tickGroup = new THREE.Group();
+    for (let t = 0; t < 36; t++) {
+      const angle = (t / 36) * Math.PI * 2;
+      const long = t % 9 === 0;
+      const tick = new THREE.Mesh(
+        new THREE.BoxGeometry(0.025, 0.002, long ? 0.18 : 0.08),
+        tickMat
+      );
+      const r = 3.18;
+      tick.position.set(Math.cos(angle) * r, -0.575, Math.sin(angle) * r);
+      tick.rotation.y = -angle + Math.PI / 2;
+      tickGroup.add(tick);
+    }
+    rings.add(tickGroup);
+
+    // Hex grid pad (wireframe hexagonal mesh)
+    const padMat = new THREE.MeshBasicMaterial({
+      color, transparent: true, opacity: 0.11, side: THREE.DoubleSide, wireframe: true
+    });
+    const pad = new THREE.Mesh(new THREE.CircleGeometry(3, 6), padMat);
     pad.rotation.x = Math.PI / 2;
-    pad.position.y = -0.58;
+    pad.position.y = -0.6;
     rings.add(pad);
+
+    // Cross hairlines (north-south, east-west)
+    const hairMat = new THREE.MeshBasicMaterial({
+      color, transparent: true, opacity: 0.22,
+      blending: THREE.AdditiveBlending, depthWrite: false
+    });
+    const ns = new THREE.Mesh(new THREE.BoxGeometry(0.005, 0.001, 6.0), hairMat);
+    ns.position.y = -0.578;
+    rings.add(ns);
+    const ew = new THREE.Mesh(new THREE.BoxGeometry(6.0, 0.001, 0.005), hairMat);
+    ew.position.y = -0.578;
+    rings.add(ew);
+
+    // Animated scan ring (sweeps outward)
+    const scanMat = new THREE.MeshBasicMaterial({
+      color, transparent: true, opacity: 0.0,
+      blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide
+    });
+    const scan = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.04, 96), scanMat);
+    scan.rotation.x = Math.PI / 2;
+    scan.position.y = -0.572;
+    rings.add(scan);
+
+    // Vertical scan beam (cylinder, rises through chip)
+    const beamMat = new THREE.MeshBasicMaterial({
+      color, transparent: true, opacity: 0.0,
+      blending: THREE.AdditiveBlending, depthWrite: false
+    });
+    const beam = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.7, 0.7, 0.02, 64, 1, true),
+      beamMat
+    );
+    beam.position.y = 0;
+    rings.add(beam);
+
+    // Diagonal hex-tile rings rotating in opposite directions
+    const innerHex = new THREE.Mesh(
+      new THREE.RingGeometry(1.6, 1.62, 6),
+      new THREE.MeshBasicMaterial({
+        color, transparent: true, opacity: 0.35, side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending, depthWrite: false
+      })
+    );
+    innerHex.rotation.x = Math.PI / 2;
+    innerHex.position.y = -0.565;
+    rings.add(innerHex);
+
+    rings.userData.dynamic = { tickGroup, scan, scanMat, beam, beamMat, innerHex };
+    rings.userData.tick = (t) => {
+      // tick group rotates slow CCW
+      tickGroup.rotation.y = t * 0.15;
+      // inner hex rotates faster CW
+      innerHex.rotation.z = -t * 0.4;
+      // scan ring expands then resets
+      const scanT = (t * 0.5) % 1;
+      const sR = 0.6 + scanT * 2.6;
+      scan.geometry.dispose();
+      scan.geometry = new THREE.RingGeometry(sR, sR + 0.04, 96);
+      scanMat.opacity = (1 - scanT) * 0.5;
+      // vertical beam — rises and fades
+      const beamT = ((t * 0.7) % 1);
+      beam.position.y = -0.55 + beamT * 1.6;
+      beamMat.opacity = Math.sin(beamT * Math.PI) * 0.18;
+    };
+
     group.add(rings);
     return rings;
   }
@@ -334,6 +801,7 @@
       gpu.rotation.x = Math.sin(t * 0.45) * 0.04 + my * -0.1;
       gpu.position.y = Math.sin(t * 0.8) * 0.06;
       fans.forEach((f) => (f.rotation.y -= 0.26));
+      gpu.userData.cards.forEach((c) => c.userData.tick && c.userData.tick(t));
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
@@ -452,6 +920,8 @@
       const tZ = activeLayer === 4 ? 6.2 : 7;
       camera.position.z = lerp(camera.position.z, tZ, 0.04);
 
+      gpu.userData.cards.forEach((c) => c.userData.tick && c.userData.tick(t));
+
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
@@ -475,7 +945,7 @@
 
     const stage = new THREE.Group();
     scene.add(stage);
-    addHoloRings(stage);
+    const holoRings = addHoloRings(stage);
 
     const gpu = makeGPU({ scale: 1.45 });
     stage.add(gpu);
@@ -618,6 +1088,14 @@
         ledStrip.material.opacity = lerp(ledStrip.material.opacity, tgt, 0.12);
       }
 
+      // Drive PCB-level component animation (die pulse, VRM phase rotation,
+      // PCIe finger shimmer, memory thermal, energy traces)
+      if (gpu.userData.cards) {
+        gpu.userData.cards.forEach((c) => c.userData.tick && c.userData.tick(t));
+      }
+      // Drive hologram base animation (scan ring, beam, tick rotation)
+      if (holoRings && holoRings.userData.tick) holoRings.userData.tick(t);
+
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
@@ -642,7 +1120,7 @@
 
     const holder = new THREE.Group();
     scene.add(holder);
-    addHoloRings(holder);
+    const holoRings = addHoloRings(holder);
 
     let gpu = makeGPU({ scale: 1 });
     holder.add(gpu);
@@ -820,8 +1298,12 @@
       gpu.rotation.x = Math.sin(t * 0.6) * 0.06;
       gpu.position.y = Math.sin(t * 0.9) * 0.05;
       if (gpu.userData.cards) {
-        gpu.userData.cards.forEach((c) => c.userData.fans.forEach((f) => (f.rotation.y -= 0.35)));
+        gpu.userData.cards.forEach((c) => {
+          c.userData.fans.forEach((f) => (f.rotation.y -= 0.35));
+          c.userData.tick && c.userData.tick(t);
+        });
       }
+      if (holoRings && holoRings.userData.tick) holoRings.userData.tick(t);
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
@@ -1011,10 +1493,12 @@
           f.position.y = lerp(f.position.y, 0.65 + ex * 0.6, 0.08);
           f.rotation.y -= 0.24 + tune * 0.12 + cert * 0.08;
         });
+        if (card.userData.tick) card.userData.tick(t);
       });
       gpu.rotation.y = lerp(gpu.rotation.y, t * 0.11 + cert * 0.2, 0.08);
       gpu.rotation.x = lerp(gpu.rotation.x, Math.sin(t * 0.45) * 0.04 + ex * 0.04, 0.08);
       gpu.position.y = Math.sin(t * 0.8) * 0.06;
+      if (holo && holo.userData.tick) holo.userData.tick(t);
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
