@@ -65,203 +65,227 @@
   // ----- Product Catalog -----
   const PRODUCTS = [
     {
-      id: "nc-pro-4090",
-      name: "Nucore Pro · RTX 4090 Tower",
+      id: "nc-pro-tower",
+      name: "Nucore Pro Tower · NU-RTX4090 AI Workstation",
       category: "pc",
-      categoryLabel: "Custom PC",
+      categoryLabel: "Nucore PC",
       price: 4290,
       stock: 6,
-      description: "A purpose-built AI workstation tower around an undervolted, re-thermalized RTX 4090. Ships pre-loaded with CUDA, PyTorch, Ollama, and Llama 3.1 70B.",
-      longDescription: "The Pro Tower is the daily-driver Nucore unit for AI developers and small studios. Every 4090 is intake-tested, repasted with PTM7950, undervolted to a stable curve, and 24-hour soak-tested under sustained inference load. The chassis is acoustically tuned — under 32 dB at full load. Boots straight into a Linux environment with your model already warm.",
+      description: "A Nucore-engineered AI workstation built around our NU-RTX4090. Hand-assembled, silicon-tuned, and shipped with the model you'll run already warm in memory.",
+      longDescription: "The Pro Tower is the daily-driver Nucore build for AI developers and small studios. We start from raw silicon — our NU-RTX4090 is intake-graded, fully disassembled, repasted with PTM7950, rebound to a custom undervolt curve, and 24-hour soak-tested under sustained inference load. The chassis is acoustically engineered (sub-32 dB at full load), the airflow CFD-modeled, and the OS layer pre-tuned. Boots straight into a Linux environment with CUDA, PyTorch, Ollama, and Llama 3.1 70B already loaded. This is not a system-integrator build — every layer was rebuilt by Nucore.",
       specs: [
-        ["GPU", "NVIDIA RTX 4090 · 24GB GDDR6X · undervolted -112mV"],
-        ["CPU", "AMD Ryzen 9 7950X · 16C/32T"],
-        ["RAM", "64 GB DDR5-6000 ECC"],
+        ["GPU", "Nucore NU-RTX4090 · 24GB GDDR6X · -112mV verified"],
+        ["CPU", "Nucore-binned Ryzen 9 7950X · 16C/32T"],
+        ["RAM", "64 GB DDR5-6000 ECC · EXPO-tuned"],
         ["Storage", "2 TB NVMe Gen4 + 4 TB NVMe data"],
-        ["PSU", "1000W 80+ Platinum"],
-        ["Cooling", "360mm AIO + custom intake"],
-        ["OS", "Ubuntu 24.04 LTS · Nucore Stack pre-loaded"],
-        ["Warranty", "2 years · signed certification"]
+        ["PSU", "Nucore-spec 1000W 80+ Platinum"],
+        ["Cooling", "Custom 360mm loop · acoustically tuned"],
+        ["OS", "Nucore Stack on Ubuntu 24.04 LTS"],
+        ["Warranty", "2 years · signed Nucore certification"]
       ]
     },
     {
-      id: "nc-studio-7900",
-      name: "Nucore Studio · 7900 XTX Creative",
+      id: "nc-studio-tower",
+      name: "Nucore Studio Tower · NU-7900XTX Creative",
       category: "pc",
-      categoryLabel: "Custom PC",
+      categoryLabel: "Nucore PC",
       price: 3490,
       stock: 3,
-      description: "A silent creative tower for Stable Diffusion, ComfyUI, and AI video work — no throttling mid-render, no fans screaming at a client meeting.",
-      longDescription: "Tuned for sustained creative workloads. The Radeon 7900 XTX is repasted, undervolted, and paired with a Threadripper 7960X. Ideal for ComfyUI pipelines and AI-assisted compositing.",
+      description: "A Nucore-engineered creative tower for Stable Diffusion, ComfyUI, and AI video — silent, sustained, no throttle mid-render. Built around our NU-7900XTX.",
+      longDescription: "Engineered for sustained creative workloads. Our NU-7900XTX (Nucore-rebuilt Radeon 7900 XTX) is paired with a binned Threadripper 7960X on a custom Nucore loop. Tuned for ComfyUI pipelines, AI-assisted compositing, and long-form generative video.",
       specs: [
-        ["GPU", "AMD Radeon RX 7900 XTX · 24GB"],
-        ["CPU", "AMD Threadripper 7960X · 24C/48T"],
-        ["RAM", "128 GB DDR5 ECC"],
-        ["Storage", "2 TB NVMe + 8 TB SSD scratch"],
-        ["Cooling", "Custom loop · acoustically tuned"],
-        ["OS", "Ubuntu Studio · pre-loaded ComfyUI"]
+        ["GPU", "Nucore NU-7900XTX · 24GB"],
+        ["CPU", "Nucore-binned Threadripper 7960X · 24C/48T"],
+        ["RAM", "128 GB DDR5 ECC · EXPO-tuned"],
+        ["Storage", "2 TB NVMe + 8 TB NVMe scratch"],
+        ["Cooling", "Custom Nucore loop · acoustically tuned"],
+        ["OS", "Nucore Stack · ComfyUI pre-deployed"]
       ]
     },
     {
-      id: "nc-lite-4070",
-      name: "Nucore Lite · RTX 4070 Mini",
+      id: "nc-lite-tower",
+      name: "Nucore Lite Tower · NU-RTX4070 Compact",
       category: "pc",
-      categoryLabel: "Custom PC",
+      categoryLabel: "Nucore PC",
       price: 1890,
       stock: 12,
-      description: "An entry-tier Nucore for indie devs and students. Compact, quiet, hand-certified — a 4070 with the same four-layer treatment as the flagships.",
-      longDescription: "The on-ramp into the Nucore lineup. Same intake, thermal, tuning, and software process — at a price that gets you started.",
+      description: "The on-ramp Nucore build — a compact, silent NU-RTX4070 system that runs the same four-layer engineering as our flagships, just smaller silicon.",
+      longDescription: "Same intake, thermal, tuning, and software process as the Pro and Studio towers — applied to a more accessible silicon tier. Compact 14L chassis, fully Nucore-engineered.",
       specs: [
-        ["GPU", "NVIDIA RTX 4070 · 12GB"],
-        ["CPU", "AMD Ryzen 7 7700X"],
-        ["RAM", "32 GB DDR5"],
+        ["GPU", "Nucore NU-RTX4070 · 12GB"],
+        ["CPU", "Nucore-binned Ryzen 7 7700X"],
+        ["RAM", "32 GB DDR5 · EXPO-tuned"],
         ["Storage", "1 TB NVMe Gen4"],
-        ["Form factor", "Mini-ITX · 14L chassis"],
-        ["OS", "Ubuntu 24.04 + Nucore Stack"]
+        ["Form factor", "Nucore Mini-ITX · 14L"],
+        ["OS", "Nucore Stack on Ubuntu 24.04"]
       ]
     },
     {
-      id: "nc-gpu-4090",
-      name: "RTX 4090 · Nucore-Certified",
+      id: "nc-gpu-rtx4090",
+      name: "Nucore NU-RTX4090 · 24GB",
       category: "gpu",
-      categoryLabel: "GPU",
+      categoryLabel: "Nucore GPU",
       price: 1980,
       stock: 9,
-      description: "A bare RTX 4090, intake-graded, repasted with PTM7950, and signed with a benchmark certificate. Drop into your existing rig.",
-      longDescription: "Every certified 4090 ships with its individual benchmark report — sustained TFLOPS, junction temps, fan curve, undervolt offset. -17°C average thermal delta vs. stock.",
+      description: "Our flagship GPU — a Nucore-rebuilt 4090 with PTM7950, a custom undervolt curve, and a signed benchmark certificate in every box. -17°C sustained vs. reference.",
+      longDescription: "The NU-RTX4090 is not a 'used 4090.' It is a Nucore product. Every card is fully disassembled in our facility, the die repasted with PTM7950 phase-change material, the VRAM and VRM re-padded, the fan curve re-mapped, and the silicon individually undervolted to a stable curve under sustained Llama 70B inference. Each unit ships with its own benchmark PDF — sustained TFLOPS, junction temps, fan profile, and the Nucore signature hash.",
       specs: [
         ["VRAM", "24 GB GDDR6X"],
-        ["TGP", "450W (configurable to 380W)"],
-        ["Thermal pad", "PTM7950 · re-applied"],
-        ["Undervolt", "-112mV verified stable"],
-        ["Soak test", "24h FurMark + Llama 70B"],
-        ["Box", "Signed certificate + benchmark PDF"]
+        ["TGP", "450W (Nucore eco-mode 380W)"],
+        ["Thermal", "PTM7950 die + fresh VRAM/VRM pads"],
+        ["Tuning", "-112mV verified · custom fan curve"],
+        ["Soak test", "24h FurMark + 24h Llama 70B"],
+        ["Ships with", "Signed Nucore cert + benchmark PDF"]
       ]
     },
     {
-      id: "nc-gpu-3090",
-      name: "RTX 3090 · Refurbished + Certified",
+      id: "nc-gpu-rtx3090",
+      name: "Nucore NU-RTX3090 · 24GB",
       category: "gpu",
-      categoryLabel: "GPU",
+      categoryLabel: "Nucore GPU",
       price: 980,
       stock: 14,
-      description: "Used 3090s, fully disassembled, re-pasted, re-padded, undervolted, and 24h soak-tested. The cheapest 24GB VRAM you can trust.",
+      description: "The most affordable 24GB VRAM in the Nucore lineup — a fully rebuilt and re-engineered 3090, signed with the same certification process as the flagship.",
+      longDescription: "The NU-RTX3090 is rebuilt from the silicon up: stripped, repasted, re-padded, re-tuned, and 24-hour soak tested. Same engineering process as the flagship NU-RTX4090, applied to a more accessible price point. Backed by Nucore — not a reseller warranty.",
       specs: [
         ["VRAM", "24 GB GDDR6X"],
-        ["Status", "Refurbished · grade A"],
-        ["Thermal", "PTM7950 + new memory pads"],
-        ["Soak test", "24h"],
-        ["Warranty", "1 year · Nucore-backed"]
+        ["Thermal", "PTM7950 die + fresh memory pads"],
+        ["Tuning", "Nucore custom undervolt curve"],
+        ["Soak test", "24h sustained load"],
+        ["Warranty", "1 year · Nucore-backed"],
+        ["Ships with", "Signed Nucore cert + benchmark PDF"]
       ]
     },
     {
       id: "nc-gpu-h100",
-      name: "NVIDIA H100 80GB · PCIe",
+      name: "Nucore NU-H100 · 80GB Datacenter",
       category: "gpu",
-      categoryLabel: "GPU",
+      categoryLabel: "Nucore GPU",
       price: 28500,
       stock: 2,
-      description: "Datacenter-class H100 PCIe. Limited stock — for training and high-throughput inference workloads.",
+      description: "Nucore-certified H100 PCIe for training and high-throughput inference. Re-thermalized, fully validated, signed — datacenter silicon with the Nucore process applied.",
       specs: [
         ["VRAM", "80 GB HBM3"],
         ["Form", "PCIe Gen5 · dual-slot"],
-        ["TDP", "350W"],
-        ["NVLink", "Bridge available on request"]
+        ["TDP", "350W (Nucore-tuned)"],
+        ["Validation", "Full Nucore certification + thermal pass"],
+        ["NVLink", "Bridge available on request"],
+        ["Ships with", "Signed Nucore cert + benchmark PDF"]
+      ]
+    },
+    {
+      id: "nc-gpu-rtx6000",
+      name: "Nucore NU-RTX6000A · 48GB Pro",
+      category: "gpu",
+      categoryLabel: "Nucore GPU",
+      price: 6890,
+      stock: 4,
+      description: "Nucore-engineered RTX 6000 Ada — 48GB of pro-grade VRAM, fully re-thermalized and silicon-tuned for sustained 24/7 workloads.",
+      specs: [
+        ["VRAM", "48 GB GDDR6 ECC"],
+        ["Form", "Dual-slot blower · 300W"],
+        ["Thermal", "PTM7950 die + fresh VRM pads"],
+        ["Tuning", "Nucore sustained-load curve"],
+        ["Use", "Multi-tenant inference · 3D / VFX"],
+        ["Ships with", "Signed Nucore cert + benchmark PDF"]
       ]
     },
     {
       id: "nc-lab-dual",
-      name: "Nucore Lab · Dual-GPU Training Rig",
+      name: "Nucore Lab · Dual NU-RTX4090 Training Rig",
       category: "workstation",
-      categoryLabel: "Workstation",
+      categoryLabel: "Nucore Workstation",
       price: 9990,
       stock: 2,
-      description: "A dual-4090 (or dual-6000 Ada on request) training workstation in a quiet desk-side chassis. NVLink-ready, EPYC-powered.",
-      longDescription: "Designed for fine-tuning and multi-GPU inference. Two RTX 4090s on a custom backplane with explicit airflow zoning, fed by an EPYC Genoa with 256GB ECC.",
+      description: "A Nucore-engineered desk-side training rig — two NU-RTX4090s on a custom backplane, EPYC Genoa, explicit airflow zoning. NVLink-ready.",
+      longDescription: "Designed in-house at Nucore for fine-tuning and multi-GPU inference. Two NU-RTX4090s on a Nucore-spec backplane, with CFD-modeled airflow zoning and a Nucore-binned EPYC Genoa CPU. Quiet enough to sit beside a desk, sustained enough to train through the night.",
       specs: [
-        ["GPUs", "2 × RTX 4090 (or 2 × RTX 6000 Ada)"],
-        ["CPU", "AMD EPYC 9354P · 32C"],
+        ["GPUs", "2 × Nucore NU-RTX4090 (or 2 × NU-RTX6000A)"],
+        ["CPU", "Nucore-binned EPYC 9354P · 32C"],
         ["RAM", "256 GB DDR5 ECC"],
         ["Storage", "4 TB NVMe + 16 TB NVMe scratch"],
-        ["PSU", "1600W redundant"],
+        ["PSU", "Nucore-spec 1600W redundant"],
         ["Network", "10GbE + IPMI"]
       ]
     },
     {
       id: "nc-cluster-1u",
-      name: "Nucore Cluster · 1U Inference Node",
+      name: "Nucore Cluster · 1U NU-A100 Inference Node",
       category: "workstation",
-      categoryLabel: "Workstation",
+      categoryLabel: "Nucore Workstation",
       price: 14500,
       stock: 1,
-      description: "Rack-ready 1U inference node — A100 40GB, dual EPYC, 25GbE. Drop into a 19\" rack and serve.",
+      description: "Rack-ready 1U Nucore inference node — NU-A100 40GB, dual EPYC, 25GbE. Drop into a 19\" rack and serve.",
       specs: [
-        ["GPU", "NVIDIA A100 40GB"],
-        ["CPU", "2 × EPYC 7443"],
+        ["GPU", "Nucore NU-A100 · 40GB"],
+        ["CPU", "Nucore-binned 2 × EPYC 7443"],
         ["RAM", "512 GB DDR4 ECC"],
         ["Network", "Dual 25GbE SFP28"],
-        ["Form", "1U · rail kit included"]
+        ["Form", "1U · Nucore rail kit included"]
       ]
     },
     {
       id: "nc-phone-px",
-      name: "Pixel 9 Pro · Privacy-Hardened",
+      name: "Nucore PX-9 · Hardened Mobile",
       category: "phone",
-      categoryLabel: "Phone",
+      categoryLabel: "Nucore Phone",
       price: 1290,
       stock: 7,
-      description: "A Pixel 9 Pro flashed with GrapheneOS, privacy-hardened, and verified. Carrier-unlocked, signed certification.",
+      description: "A Nucore-hardened mobile device — Pixel 9 Pro chassis, Nucore-built secure-boot firmware, signed and verified. Engineered for engineers who don't want their phone to leak.",
+      longDescription: "The PX-9 is a Nucore-engineered privacy mobile. We start from a fresh Pixel 9 Pro chassis, flash a hardened verified-boot OS image we build in-house, validate every keystone hash, and ship with a signed firmware certificate. Carrier-unlocked, global bands, full Nucore documentation.",
       specs: [
-        ["OS", "GrapheneOS (verified boot)"],
+        ["OS", "Nucore Hardened OS (verified boot)"],
         ["Storage", "256 GB"],
         ["RAM", "16 GB"],
         ["Carrier", "Unlocked · global bands"],
-        ["Cert", "Signed firmware hash"]
+        ["Cert", "Signed Nucore firmware hash"]
       ]
     },
     {
       id: "nc-phone-iph",
-      name: "iPhone 15 Pro Max · Refurb",
+      name: "Nucore IX-15 Pro · Engineered Mobile",
       category: "phone",
-      categoryLabel: "Phone",
+      categoryLabel: "Nucore Phone",
       price: 1090,
       stock: 4,
-      description: "Grade-A refurbished iPhone 15 Pro Max, battery >95%, full diagnostic report included.",
+      description: "A Nucore-engineered iPhone 15 Pro Max build — battery and display certified to Nucore spec, full diagnostic report, signed.",
       specs: [
         ["Storage", "512 GB"],
-        ["Battery", ">95% capacity"],
-        ["Status", "Grade A · refurbished"],
+        ["Battery", "Nucore-spec · >95% verified"],
+        ["Diagnostics", "Full Nucore validation report"],
         ["Carrier", "Unlocked"],
-        ["Warranty", "1 year"]
+        ["Warranty", "1 year · Nucore-backed"]
       ]
     },
     {
       id: "nc-cpu-7950",
-      name: "AMD Ryzen 9 7950X · Binned",
+      name: "Nucore-Binned Ryzen 9 7950X",
       category: "component",
-      categoryLabel: "Component",
+      categoryLabel: "Nucore Silicon",
       price: 520,
       stock: 18,
-      description: "Hand-binned 7950X chips — verified to hit a stable -30 PBO Curve Optimizer across all cores.",
+      description: "Hand-binned at Nucore — every chip verified to hit a stable -30 PBO Curve Optimizer across all cores. Top of its silicon batch.",
       specs: [
         ["Cores", "16C / 32T"],
-        ["Boost", "5.7 GHz verified"],
-        ["Bin", "Top 15% of intake batch"],
-        ["TDP", "170W"]
+        ["Boost", "5.7 GHz Nucore-verified"],
+        ["Bin", "Top 15% of Nucore intake batch"],
+        ["TDP", "170W"],
+        ["Ships with", "Nucore binning certificate"]
       ]
     },
     {
       id: "nc-ram-128",
-      name: "DDR5-6000 ECC · 128 GB Kit",
+      name: "Nucore-Tuned DDR5-6000 ECC · 128 GB",
       category: "component",
-      categoryLabel: "Component",
+      categoryLabel: "Nucore Silicon",
       price: 640,
       stock: 22,
-      description: "4× 32GB DDR5-6000 ECC kit, EXPO-verified at full speed on AM5 platforms.",
+      description: "Nucore-validated DDR5 kit — 4 × 32 GB, EXPO-tuned in-house and stability-tested 24h on AM5 and TRX50 platforms.",
       specs: [
         ["Capacity", "128 GB (4 × 32 GB)"],
-        ["Speed", "DDR5-6000 CL30"],
+        ["Speed", "DDR5-6000 CL30 · Nucore-tuned"],
         ["ECC", "On-die + sideband"],
+        ["Validation", "24h Nucore stability pass"],
         ["Verified on", "AM5 / TRX50"]
       ]
     },
@@ -269,28 +293,30 @@
       id: "nc-acc-cable",
       name: "Nucore 12VHPWR Cable · Reinforced",
       category: "accessory",
-      categoryLabel: "Accessory",
+      categoryLabel: "Nucore Accessory",
       price: 49,
       stock: 80,
-      description: "Replacement 12VHPWR cable with reinforced connector and verified pin tension. Fits all Nucore PSUs.",
+      description: "Nucore-built 12VHPWR cable with reinforced connector and verified pin tension. Standard issue with every Nucore tower.",
       specs: [
         ["Gauge", "16 AWG"],
         ["Length", "650 mm"],
-        ["Compatible", "ATX 3.0 PSUs (modular)"]
+        ["Compatible", "ATX 3.0 modular PSUs"],
+        ["Validation", "Nucore pin-tension tested"]
       ]
     },
     {
       id: "nc-acc-thermal",
-      name: "PTM7950 Thermal Pad · 80×40 mm",
+      name: "Nucore PTM7950 Pad · 80×40 mm",
       category: "accessory",
-      categoryLabel: "Accessory",
+      categoryLabel: "Nucore Accessory",
       price: 24,
       stock: 60,
-      description: "The same phase-change thermal pad we apply in Layer 02. -10°C to -17°C on most GPUs vs. stock paste.",
+      description: "The exact phase-change thermal pad we apply in Layer 02 of the Nucore process. -10°C to -17°C vs. stock paste on most GPUs.",
       specs: [
         ["Material", "PTM7950 phase change"],
         ["Size", "80 × 40 × 0.2 mm"],
-        ["Use", "GPU die · CPU IHS"]
+        ["Use", "GPU die · CPU IHS"],
+        ["Source", "Same lot Nucore uses in-house"]
       ]
     }
   ];
